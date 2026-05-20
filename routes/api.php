@@ -20,11 +20,9 @@ Route::prefix('auth')->group(function () {
 });
 
 // Email verification routes (public but requires email verification token)
-Route::prefix('auth')->group(function () {
-    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verify-email');
-});
+Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
 
 // Protected routes (requires authentication)
 Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
