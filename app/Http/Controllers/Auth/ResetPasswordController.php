@@ -4,30 +4,27 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Password;
 
 class ResetPasswordController extends Controller
 {
-    public function __invoke(ResetPasswordRequest $request): JsonResponse
+    /**
+     * Reset user password
+     *
+     * @param ResetPasswordRequest $request
+     * @param AuthService $authService
+     * @return JsonResponse
+     */
+    public function __invoke(ResetPasswordRequest $request, AuthService $authService): JsonResponse
     {
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => $password,
-                ])->save();
-            }
-        );
+        $result = $authService->resetPassword($request->validated());
 
-        if ($status === Password::PASSWORD_RESET) {
-            return $this->successResponse(null, 'Password reset successfully');
+        // If result is a JsonResponse, it's an error
+        if ($result instanceof JsonResponse) {
+            return $result;
         }
 
-        return $this->errorResponse(
-            'Unable to reset password',
-            ['error' => __($status)],
-            400
-        );
+        return $this->successResponse(null, 'Password reset successfully');
     }
 }

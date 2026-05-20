@@ -4,29 +4,30 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    public function __invoke(LoginRequest $request): JsonResponse
+    /**
+     * Authenticate user and generate API token
+     *
+     * @param LoginRequest $request
+     * @param AuthService $authService
+     * @return JsonResponse
+     */
+    public function __invoke(LoginRequest $request, AuthService $authService): JsonResponse
     {
-        if (!Auth::attempt($request->validated())) {
-            return $this->unauthorizedResponse('Invalid credentials');
+        $result = $authService->login($request->validated());
+
+        // If result is a JsonResponse, it's an error
+        if ($result instanceof JsonResponse) {
+            return $result;
         }
-
-        $user = Auth::user();
-
-        // Check if email is verified
-        if (!$user->email_verified_at) {
-            return $this->forbiddenResponse('Please verify your email before logging in');
-        }
-
-        $token = $user->createToken('api-token')->plainTextToken;
 
         return $this->successResponse([
-            'user' => $user->load('role'),
-            'token' => $token,
+            'user' => $result['user'],
+            'token' => $result['token'],
         ], 'Login successful');
     }
 }

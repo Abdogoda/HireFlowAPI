@@ -3,11 +3,18 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 
 class RefreshTokenController extends Controller
 {
-    public function __invoke(): JsonResponse
+    /**
+     * Refresh user's API token
+     *
+     * @param AuthService $authService
+     * @return JsonResponse
+     */
+    public function __invoke(AuthService $authService): JsonResponse
     {
         $user = auth('sanctum')->user();
 
@@ -15,14 +22,15 @@ class RefreshTokenController extends Controller
             return $this->unauthorizedResponse('Unauthenticated');
         }
 
-        // Revoke current token
-        $user->currentAccessToken()->delete();
+        $result = $authService->refreshToken($user);
 
-        // Generate new token
-        $newToken = $user->createToken('api-token')->plainTextToken;
+        // If result is a JsonResponse, it's an error
+        if ($result instanceof JsonResponse) {
+            return $result;
+        }
 
         return $this->successResponse(
-            ['token' => $newToken],
+            ['token' => $result],
             'Token refreshed successfully'
         );
     }

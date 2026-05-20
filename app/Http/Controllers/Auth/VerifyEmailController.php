@@ -3,34 +3,35 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Auth\Events\Verified;
+use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class VerifyEmailController extends Controller
 {
-    public function __invoke(Request $request): JsonResponse
+    /**
+     * Verify user email using hash
+     *
+     * @param Request $request
+     * @param AuthService $authService
+     * @return JsonResponse
+     */
+    public function __invoke(Request $request, AuthService $authService): JsonResponse
     {
-        $user = User::find($request->route('id'));
+        $userId = $request->route('id');
+        $hash = $request->route('hash');
 
-        if (!$user) {
-            return $this->notFoundResponse('User not found');
+        $result = $authService->verifyEmail($userId, $hash);
+
+        // If result is a JsonResponse, it's an error
+        if ($result instanceof JsonResponse) {
+            return $result;
         }
 
-        // Verify the hash
-        if (sha1($user->email) !== $request->route('hash')) {
-            return $this->forbiddenResponse('Signature mismatch');
-        }
+        $message = $result['verified']
+            ? 'Email verified successfully'
+            : 'Email already verified';
 
-        if ($user->hasVerifiedEmail()) {
-            return $this->successResponse(null, 'Email already verified');
-        }
-
-        if ($user->markEmailAsVerified()) {
-            event(new Verified($user));
-        }
-
-        return $this->successResponse(null, 'Email verified successfully');
+        return $this->successResponse(null, $message);
     }
 }

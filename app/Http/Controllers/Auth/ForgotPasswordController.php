@@ -4,25 +4,27 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Password;
 
 class ForgotPasswordController extends Controller
 {
-    public function __invoke(ForgotPasswordRequest $request): JsonResponse
+    /**
+     * Send password reset link to user email
+     *
+     * @param ForgotPasswordRequest $request
+     * @param AuthService $authService
+     * @return JsonResponse
+     */
+    public function __invoke(ForgotPasswordRequest $request, AuthService $authService): JsonResponse
     {
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        $result = $authService->sendPasswordResetLink($request->validated());
 
-        if ($status === Password::RESET_LINK_SENT) {
-            return $this->successResponse(null, 'Password reset link sent to your email');
+        // If result is a JsonResponse, it's an error
+        if ($result instanceof JsonResponse) {
+            return $result;
         }
 
-        return $this->errorResponse(
-            'Unable to send password reset link',
-            ['error' => __($status)],
-            400
-        );
+        return $this->successResponse(null, 'Password reset link sent to your email');
     }
 }

@@ -3,11 +3,18 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 
 class LogoutController extends Controller
 {
-    public function __invoke(): JsonResponse
+    /**
+     * Logout user by revoking current token
+     *
+     * @param AuthService $authService
+     * @return JsonResponse
+     */
+    public function __invoke(AuthService $authService): JsonResponse
     {
         $user = auth('sanctum')->user();
 
@@ -15,7 +22,12 @@ class LogoutController extends Controller
             return $this->unauthorizedResponse('Unauthenticated');
         }
 
-        $user->currentAccessToken()->delete();
+        $result = $authService->logout($user);
+
+        // If result is a JsonResponse, it's an error
+        if ($result instanceof JsonResponse) {
+            return $result;
+        }
 
         return $this->successResponse(null, 'Logout successful');
     }
