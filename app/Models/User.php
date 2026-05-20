@@ -13,8 +13,11 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Notifications\VerifyEmailNotification;
 use App\Notifications\ResetPasswordNotification;
+use App\Enums\Users\Gender;
+use App\Enums\Users\MaritalStatus;
+use App\Enums\Users\Religion;
 
-#[Fillable(['name', 'email', 'password', 'role_id', 'email_verified_at'])]
+#[Fillable(['name', 'email', 'password', 'role_id', 'email_verified_at', 'avatar', 'bio', 'thumbnail', 'profile_image', 'phone_number', 'address', 'city', 'state', 'country', 'gender', 'marital_status', 'religion'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmailContract
 {
@@ -25,6 +28,9 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'gender' => Gender::class,
+            'marital_status' => MaritalStatus::class,
+            'religion' => Religion::class,
         ];
     }
 
@@ -51,6 +57,11 @@ class User extends Authenticatable implements MustVerifyEmailContract
     public function resumes(): HasMany
     {
         return $this->hasMany(Resume::class);
+    }
+
+    public function socialProfiles(): HasMany
+    {
+        return $this->hasMany(SocialProfile::class);
     }
 
     public function getRoleNameAttribute(): ?string
