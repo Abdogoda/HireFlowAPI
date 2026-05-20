@@ -26,7 +26,16 @@ describe('Forgot Password Endpoint', function () {
         ]);
 
         $response->assertStatus(200)
-            ->assertJson(['message' => 'Password reset link sent to your email']);
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data',
+                'timestamp',
+            ])
+            ->assertJson([
+                'success' => true,
+                'message' => 'Password reset link sent to your email',
+            ]);
     });
 
     it('fails with non-existent email', function () {

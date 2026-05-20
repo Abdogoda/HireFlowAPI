@@ -23,10 +23,20 @@ describe('Register Endpoint', function () {
         ]);
 
         $response->assertStatus(201)
-            ->assertJsonStructure(['message', 'user' => ['id', 'name', 'email', 'role']])
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data' => [
+                    'user' => ['id', 'name', 'email', 'role'],
+                ],
+                'timestamp',
+            ])
             ->assertJson([
+                'success' => true,
                 'message' => 'User registered successfully. Please verify your email.',
-                'user' => ['name' => 'John Doe', 'email' => 'john@example.com'],
+                'data' => [
+                    'user' => ['name' => 'John Doe', 'email' => 'john@example.com'],
+                ],
             ]);
 
         $this->assertDatabaseHas('users', ['name' => 'John Doe', 'email' => 'john@example.com']);

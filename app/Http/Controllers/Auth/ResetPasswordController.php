@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Password;
 
 class ResetPasswordController extends Controller
@@ -22,14 +21,13 @@ class ResetPasswordController extends Controller
         );
 
         if ($status === Password::PASSWORD_RESET) {
-            return response()->json([
-                'message' => 'Password reset successfully',
-            ], Response::HTTP_OK);
+            return $this->successResponse(null, 'Password reset successfully');
         }
 
-        return response()->json([
-            'message' => 'Unable to reset password',
-            'error' => __($status),
-        ], Response::HTTP_BAD_REQUEST);
+        return $this->errorResponse(
+            'Unable to reset password',
+            ['error' => __($status)],
+            400
+        );
     }
 }

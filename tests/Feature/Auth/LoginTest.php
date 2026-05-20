@@ -27,10 +27,27 @@ describe('Login Endpoint', function () {
         ]);
 
         $response->assertStatus(200)
-            ->assertJsonStructure(['message', 'user' => ['id', 'name', 'email', 'role'], 'token'])
-            ->assertJson(['message' => 'Login successful', 'user' => ['name' => 'John Doe', 'email' => 'john@example.com']]);
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data' => [
+                    'user' => ['id', 'name', 'email', 'role'],
+                    'token',
+                ],
+                'timestamp',
+            ])
+            ->assertJson([
+                'success' => true,
+                'message' => 'Login successful',
+                'data' => [
+                    'user' => [
+                        'name' => 'John Doe',
+                        'email' => 'john@example.com',
+                    ],
+                ],
+            ]);
 
-        $this->assertNotEmpty($response->json('token'));
+        $this->assertNotEmpty($response->json('data.token'));
     });
 
     it('fails with unverified email', function () {

@@ -27,7 +27,16 @@ describe('Resend Verification Email Endpoint', function () {
             ->postJson('/api/auth/resend-verification-email');
 
         $response->assertStatus(200)
-            ->assertJson(['message' => 'Verification email sent']);
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data',
+                'timestamp',
+            ])
+            ->assertJson([
+                'success' => true,
+                'message' => 'Verification email sent',
+            ]);
     });
 
     it('fails when not authenticated', function () {

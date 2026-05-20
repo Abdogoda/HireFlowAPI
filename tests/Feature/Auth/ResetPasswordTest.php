@@ -31,7 +31,16 @@ describe('Reset Password Endpoint', function () {
         ]);
 
         $response->assertStatus(200)
-            ->assertJson(['message' => 'Password reset successfully']);
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data',
+                'timestamp',
+            ])
+            ->assertJson([
+                'success' => true,
+                'message' => 'Password reset successfully',
+            ]);
 
         $user->refresh();
         $this->assertTrue(Hash::check('newpassword123', $user->password));

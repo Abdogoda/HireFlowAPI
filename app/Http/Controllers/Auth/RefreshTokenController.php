@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 
 class RefreshTokenController extends Controller
 {
@@ -13,9 +12,7 @@ class RefreshTokenController extends Controller
         $user = auth('sanctum')->user();
 
         if (!$user) {
-            return response()->json([
-                'message' => 'Unauthenticated',
-            ], Response::HTTP_UNAUTHORIZED);
+            return $this->unauthorizedResponse('Unauthenticated');
         }
 
         // Revoke current token
@@ -24,9 +21,9 @@ class RefreshTokenController extends Controller
         // Generate new token
         $newToken = $user->createToken('api-token')->plainTextToken;
 
-        return response()->json([
-            'message' => 'Token refreshed successfully',
-            'token' => $newToken,
-        ], Response::HTTP_OK);
+        return $this->successResponse(
+            ['token' => $newToken],
+            'Token refreshed successfully'
+        );
     }
 }

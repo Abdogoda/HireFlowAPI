@@ -30,7 +30,16 @@ describe('Email Verification Endpoint', function () {
         $response = $this->getJson($verificationUrl);
 
         $response->assertStatus(200)
-            ->assertJson(['message' => 'Email verified successfully']);
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data',
+                'timestamp',
+            ])
+            ->assertJson([
+                'success' => true,
+                'message' => 'Email verified successfully',
+            ]);
 
         $user->refresh();
         $this->assertNotNull($user->email_verified_at);
@@ -75,7 +84,16 @@ describe('Email Verification Endpoint', function () {
         $response = $this->getJson($verificationUrl);
 
         $response->assertStatus(200)
-            ->assertJson(['message' => 'Email already verified']);
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data',
+                'timestamp',
+            ])
+            ->assertJson([
+                'success' => true,
+                'message' => 'Email already verified',
+            ]);
     });
 
     it('unverified user cannot login', function () {

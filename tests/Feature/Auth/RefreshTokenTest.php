@@ -28,10 +28,18 @@ describe('Refresh Token Endpoint', function () {
             ->postJson('/api/auth/refresh-token');
 
         $response->assertStatus(200)
-            ->assertJsonStructure(['message', 'token'])
-            ->assertJson(['message' => 'Token refreshed successfully']);
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data' => ['token'],
+                'timestamp',
+            ])
+            ->assertJson([
+                'success' => true,
+                'message' => 'Token refreshed successfully',
+            ]);
 
-        $newToken = $response->json('token');
+        $newToken = $response->json('data.token');
         $this->assertNotEmpty($newToken);
         $this->assertNotSame($oldToken, $newToken);
 

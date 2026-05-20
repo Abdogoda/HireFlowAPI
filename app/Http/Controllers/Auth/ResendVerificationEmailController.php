@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 
 class ResendVerificationEmailController extends Controller
 {
@@ -13,21 +12,15 @@ class ResendVerificationEmailController extends Controller
         $user = auth('sanctum')->user();
 
         if (!$user) {
-            return response()->json([
-                'message' => 'Unauthenticated',
-            ], Response::HTTP_UNAUTHORIZED);
+            return $this->unauthorizedResponse('Unauthenticated');
         }
 
         if ($user->hasVerifiedEmail()) {
-            return response()->json([
-                'message' => 'Email already verified',
-            ], Response::HTTP_OK);
+            return $this->successResponse(null, 'Email already verified');
         }
 
         $user->sendEmailVerificationNotification();
 
-        return response()->json([
-            'message' => 'Verification email sent',
-        ], Response::HTTP_OK);
+        return $this->successResponse(null, 'Verification email sent');
     }
 }

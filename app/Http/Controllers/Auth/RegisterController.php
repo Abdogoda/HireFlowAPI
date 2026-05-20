@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 
 class RegisterController extends Controller
 {
@@ -20,15 +19,16 @@ class RegisterController extends Controller
                 'role_id' => $request->role_id,
             ]);
 
-            return response()->json([
-                'message' => 'User registered successfully. Please verify your email.',
-                'user' => $user->load('role'),
-            ], Response::HTTP_CREATED);
+            return $this->createdResponse(
+                ['user' => $user->load('role')->toArray()],
+                'User registered successfully. Please verify your email.'
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Registration failed',
-                'error' => $e->getMessage(),
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorResponse(
+                'Registration failed',
+                ['error' => $e->getMessage()],
+                500
+            );
         }
     }
 }

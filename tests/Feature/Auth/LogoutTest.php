@@ -27,7 +27,17 @@ describe('Logout Endpoint', function () {
         $response = $this->withHeader('Authorization', "Bearer $token")
             ->postJson('/api/auth/logout');
 
-        $response->assertStatus(200)->assertJson(['message' => 'Logout successful']);
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data',
+                'timestamp',
+            ])
+            ->assertJson([
+                'success' => true,
+                'message' => 'Logout successful',
+            ]);
 
         // Verify token is deleted from database
         $user->refresh();

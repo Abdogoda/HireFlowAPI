@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 
 class LogoutController extends Controller
 {
@@ -13,15 +12,11 @@ class LogoutController extends Controller
         $user = auth('sanctum')->user();
 
         if (!$user) {
-            return response()->json([
-                'message' => 'Unauthenticated',
-            ], Response::HTTP_UNAUTHORIZED);
+            return $this->unauthorizedResponse('Unauthenticated');
         }
 
         $user->currentAccessToken()->delete();
 
-        return response()->json([
-            'message' => 'Logout successful',
-        ], Response::HTTP_OK);
+        return $this->successResponse(null, 'Logout successful');
     }
 }
