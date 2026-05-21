@@ -26,6 +26,7 @@ class CvService
             $url = Storage::url($path);
 
             $resume = $user->resumes()->create([
+                'file_name' => $file->getClientOriginalName(),
                 'title' => $title ?? $file->getClientOriginalName(),
                 'file_path' => $path,
                 'file_url' => $url,

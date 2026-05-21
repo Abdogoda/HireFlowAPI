@@ -16,5 +16,6 @@ enum SocialProfileType: int
     case TIKTOK    = 6;
     case DISCORD   = 7;
     case YOUTUBE   = 8;
-    case OTHER     = 9;
+    case PORTFOLIO = 9;
+    case OTHER     = 10;
 }

@@ -15,9 +15,9 @@ class UpdateProjectRequest extends FormRequest
     {
         return [
             'title' => 'sometimes|string|max:255',
-            'description' => 'sometimes|string|nullable',
+            'description' => 'sometimes|string',
             'url' => 'sometimes|url|nullable',
-            'start_date' => 'sometimes|date|nullable',
+            'start_date' => 'sometimes|date',
             'end_date' => 'sometimes|date|nullable|after_or_equal:start_date',
             'technologies' => 'sometimes|string|nullable',
         ];

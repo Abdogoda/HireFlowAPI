@@ -15,9 +15,9 @@ class StoreProjectRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'description' => 'sometimes|string|nullable',
+            'description' => 'required|string',
             'url' => 'sometimes|url|nullable',
-            'start_date' => 'sometimes|date|nullable',
+            'start_date' => 'required|date',
             'end_date' => 'sometimes|date|nullable|after_or_equal:start_date',
             'technologies' => 'sometimes|string|nullable',
         ];
@@ -28,6 +28,8 @@ class StoreProjectRequest extends FormRequest
         return [
             'title.required' => 'Project title is required',
             'title.max' => 'Title must not exceed 255 characters',
+            'description.required' => 'Project description is required',
+            'start_date.required' => 'Start date is required',
             'url.url' => 'URL must be a valid URL',
             'end_date.after_or_equal' => 'End date must be after or equal to start date',
         ];
