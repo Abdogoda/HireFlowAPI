@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\StoreProjectRequest;
 use App\Http\Requests\Profile\UpdateProjectRequest;
+use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use App\Services\ProjectService;
 use Illuminate\Http\JsonResponse;
@@ -23,7 +24,7 @@ class ProjectController extends Controller
         $projects = $request->user()->projects()->get();
 
         return $this->successResponse(
-            ['projects' => $projects],
+            ['projects' => ProjectResource::collection($projects)],
             'Projects retrieved successfully'
         );
     }
@@ -64,7 +65,7 @@ class ProjectController extends Controller
         }
 
         return $this->successResponse(
-            ['project' => $project],
+            ['project' => new ProjectResource($project)],
             'Project retrieved successfully'
         );
     }

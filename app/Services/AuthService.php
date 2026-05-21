@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Http\Resources\UserSimpleResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
@@ -14,9 +15,9 @@ class AuthService
      * Register a new user
      *
      * @param array $data User registration data
-     * @return User|JsonResponse
+     * @return UserSimpleResource|JsonResponse
      */
-    public function register(array $data): User|JsonResponse
+    public function register(array $data): UserSimpleResource|JsonResponse
     {
         try {
             $user = User::create([
@@ -26,7 +27,7 @@ class AuthService
                 'role_id' => $data['role_id'],
             ]);
 
-            return $user->load('role');
+            return new UserSimpleResource($user->load('role'));
         } catch (\Exception $e) {
             return ResponseService::error(
                 'Failed to register user',
@@ -40,7 +41,7 @@ class AuthService
      * Authenticate user and create API token
      *
      * @param array $credentials
-     * @return array|JsonResponse ['user' => User, 'token' => string] or error response
+     * @return array|JsonResponse ['user' => UserSimpleResource, 'token' => string] or error response
      */
     public function login(array $credentials): array|JsonResponse
     {
@@ -57,7 +58,7 @@ class AuthService
         $token = $user->createToken('api-token')->plainTextToken;
 
         return [
-            'user' => $user->load('role'),
+            'user' => new UserSimpleResource($user->load('role')),
             'token' => $token,
         ];
     }

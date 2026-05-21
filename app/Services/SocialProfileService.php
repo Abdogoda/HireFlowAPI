@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\SocialProfile;
+use App\Http\Resources\SocialProfileResource;
 use Illuminate\Http\JsonResponse;
 
 class SocialProfileService
@@ -13,13 +14,13 @@ class SocialProfileService
      *
      * @param User $user
      * @param array $data
-     * @return SocialProfile|JsonResponse
+     * @return SocialProfileResource|JsonResponse
      */
-    public function createSocialProfile(User $user, array $data): SocialProfile|JsonResponse
+    public function createSocialProfile(User $user, array $data): SocialProfileResource|JsonResponse
     {
         try {
             $socialProfile = $user->socialProfiles()->create($data);
-            return $socialProfile;
+            return new SocialProfileResource($socialProfile);
         } catch (\Exception $e) {
             return ResponseService::error(
                 'Failed to create social profile',
@@ -34,13 +35,13 @@ class SocialProfileService
      *
      * @param SocialProfile $socialProfile
      * @param array $data
-     * @return SocialProfile|JsonResponse
+     * @return SocialProfileResource|JsonResponse
      */
-    public function updateSocialProfile(SocialProfile $socialProfile, array $data): SocialProfile|JsonResponse
+    public function updateSocialProfile(SocialProfile $socialProfile, array $data): SocialProfileResource|JsonResponse
     {
         try {
             $socialProfile->update($data);
-            return $socialProfile;
+            return new SocialProfileResource($socialProfile);
         } catch (\Exception $e) {
             return ResponseService::error(
                 'Failed to update social profile',

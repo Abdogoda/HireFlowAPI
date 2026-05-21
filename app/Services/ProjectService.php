@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Project;
+use App\Http\Resources\ProjectResource;
 use Illuminate\Http\JsonResponse;
 
 class ProjectService
@@ -13,13 +14,13 @@ class ProjectService
      *
      * @param User $user
      * @param array $data
-     * @return Project|JsonResponse
+     * @return ProjectResource|JsonResponse
      */
-    public function createProject(User $user, array $data): Project|JsonResponse
+    public function createProject(User $user, array $data): ProjectResource|JsonResponse
     {
         try {
             $project = $user->projects()->create($data);
-            return $project;
+            return new ProjectResource($project);
         } catch (\Exception $e) {
             return ResponseService::error(
                 'Failed to create project',
@@ -34,13 +35,13 @@ class ProjectService
      *
      * @param Project $project
      * @param array $data
-     * @return Project|JsonResponse
+     * @return ProjectResource|JsonResponse
      */
-    public function updateProject(Project $project, array $data): Project|JsonResponse
+    public function updateProject(Project $project, array $data): ProjectResource|JsonResponse
     {
         try {
             $project->update($data);
-            return $project;
+            return new ProjectResource($project);
         } catch (\Exception $e) {
             return ResponseService::error(
                 'Failed to update project',

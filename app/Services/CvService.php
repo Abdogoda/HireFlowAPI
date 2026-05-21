@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Resume;
+use App\Http\Resources\ResumeResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -16,9 +17,9 @@ class CvService
      * @param User $user
      * @param UploadedFile $file
      * @param string|null $title
-     * @return Resume|JsonResponse
+     * @return ResumeResource|JsonResponse
      */
-    public function uploadCv(User $user, UploadedFile $file, ?string $title = null): Resume|JsonResponse
+    public function uploadCv(User $user, UploadedFile $file, ?string $title = null): ResumeResource|JsonResponse
     {
         try {
             $path = $file->store('cvs', 'public');
@@ -30,7 +31,7 @@ class CvService
                 'file_url' => $url,
             ]);
 
-            return $resume;
+            return new ResumeResource($resume);
         } catch (\Exception $e) {
             return ResponseService::error(
                 'Failed to upload CV',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\StoreCvRequest;
+use App\Http\Resources\ResumeResource;
 use App\Models\Resume;
 use App\Services\CvService;
 use Illuminate\Http\JsonResponse;
@@ -22,7 +23,7 @@ class CvController extends Controller
         $cvs = $request->user()->resumes()->get();
 
         return $this->successResponse(
-            ['cvs' => $cvs],
+            ['cvs' => ResumeResource::collection($cvs)],
             'CVs retrieved successfully'
         );
     }
@@ -63,7 +64,7 @@ class CvController extends Controller
         }
 
         return $this->successResponse(
-            ['cv' => $cv],
+            ['cv' => new ResumeResource($cv)],
             'CV retrieved successfully'
         );
     }

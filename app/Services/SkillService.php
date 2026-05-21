@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Skill;
+use App\Http\Resources\SkillResource;
 use Illuminate\Http\JsonResponse;
 
 class SkillService
@@ -13,13 +14,13 @@ class SkillService
      *
      * @param User $user
      * @param array $data
-     * @return Skill|JsonResponse
+     * @return SkillResource|JsonResponse
      */
-    public function createSkill(User $user, array $data): Skill|JsonResponse
+    public function createSkill(User $user, array $data): SkillResource|JsonResponse
     {
         try {
             $skill = $user->skills()->create($data);
-            return $skill;
+            return new SkillResource($skill);
         } catch (\Exception $e) {
             return ResponseService::error(
                 'Failed to create skill',
@@ -34,13 +35,13 @@ class SkillService
      *
      * @param Skill $skill
      * @param array $data
-     * @return Skill|JsonResponse
+     * @return SkillResource|JsonResponse
      */
-    public function updateSkill(Skill $skill, array $data): Skill|JsonResponse
+    public function updateSkill(Skill $skill, array $data): SkillResource|JsonResponse
     {
         try {
             $skill->update($data);
-            return $skill;
+            return new SkillResource($skill);
         } catch (\Exception $e) {
             return ResponseService::error(
                 'Failed to update skill',

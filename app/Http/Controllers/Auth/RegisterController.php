@@ -26,7 +26,7 @@ class RegisterController extends Controller
         }
 
         return $this->createdResponse(
-            ['user' => $result->toArray()],
+            ['user' => $result],
             'User registered successfully. Please verify your email.'
         );
     }

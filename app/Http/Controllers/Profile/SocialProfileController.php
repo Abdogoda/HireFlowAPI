@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\StoreSocialProfileRequest;
 use App\Http\Requests\Profile\UpdateSocialProfileRequest;
+use App\Http\Resources\SocialProfileResource;
 use App\Models\SocialProfile;
 use App\Services\SocialProfileService;
 use Illuminate\Http\JsonResponse;
@@ -23,7 +24,7 @@ class SocialProfileController extends Controller
         $socialProfiles = $request->user()->socialProfiles()->get();
 
         return $this->successResponse(
-            ['social_profiles' => $socialProfiles],
+            ['social_profiles' => SocialProfileResource::collection($socialProfiles)],
             'Social profiles retrieved successfully'
         );
     }
@@ -64,7 +65,7 @@ class SocialProfileController extends Controller
         }
 
         return $this->successResponse(
-            ['social_profile' => $socialProfile],
+            ['social_profile' => new SocialProfileResource($socialProfile)],
             'Social profile retrieved successfully'
         );
     }

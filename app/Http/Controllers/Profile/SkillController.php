@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\StoreSkillRequest;
 use App\Http\Requests\Profile\UpdateSkillRequest;
+use App\Http\Resources\SkillResource;
 use App\Models\Skill;
 use App\Services\SkillService;
 use Illuminate\Http\JsonResponse;
@@ -23,7 +24,7 @@ class SkillController extends Controller
         $skills = $request->user()->skills()->get();
 
         return $this->successResponse(
-            ['skills' => $skills],
+            ['skills' => SkillResource::collection($skills)],
             'Skills retrieved successfully'
         );
     }
@@ -64,7 +65,7 @@ class SkillController extends Controller
         }
 
         return $this->successResponse(
-            ['skill' => $skill],
+            ['skill' => new SkillResource($skill)],
             'Skill retrieved successfully'
         );
     }

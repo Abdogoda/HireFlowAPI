@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -14,13 +15,13 @@ class ProfileService
      *
      * @param User $user
      * @param array $data
-     * @return User|JsonResponse
+     * @return UserResource|JsonResponse
      */
-    public function updateProfile(User $user, array $data): User|JsonResponse
+    public function updateProfile(User $user, array $data): UserResource|JsonResponse
     {
         try {
             $user->update($data);
-            return $user->load('role', 'skills', 'experiences', 'projects', 'resumes', 'socialProfiles');
+            return new UserResource($user->load('role', 'skills', 'experiences', 'projects', 'resumes', 'socialProfiles'));
         } catch (\Exception $e) {
             return ResponseService::error(
                 'Failed to update profile',

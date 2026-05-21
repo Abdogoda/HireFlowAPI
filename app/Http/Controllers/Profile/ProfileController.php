@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\UpdateProfileRequest;
 use App\Http\Requests\Profile\StorePictureRequest;
+use App\Http\Resources\UserResource;
 use App\Services\ProfileService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ class ProfileController extends Controller
         ]);
 
         return $this->successResponse(
-            ['profile' => $profile],
+            ['profile' => new UserResource($profile)],
             'Profile retrieved successfully'
         );
     }
