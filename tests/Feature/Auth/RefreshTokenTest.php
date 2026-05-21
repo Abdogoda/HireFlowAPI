@@ -1,24 +1,14 @@
 <?php
 
-use App\Models\Role;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-
 describe('Refresh Token Endpoint', function () {
     beforeEach(function () {
-        Role::create(['name' => 'Admin', 'description' => 'Administrator']);
-        Role::create(['name' => 'Recruiter', 'description' => 'Recruiter']);
-        Role::create(['name' => 'Candidate', 'description' => 'Candidate']);
+        $this->createDefaultRoles();
     });
 
     it('refreshes user token', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
-        $user = User::create([
+        $user = $this->createUserWithRole('Candidate', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => Hash::make('password123'),
-            'role_id' => $candidateRole->id,
-            'email_verified_at' => now(),
         ]);
 
         $oldToken = $user->createToken('api-token')->plainTextToken;
@@ -60,13 +50,9 @@ describe('Refresh Token Endpoint', function () {
     });
 
     it('user can have multiple valid tokens', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
-        $user = User::create([
+        $user = $this->createUserWithRole('Candidate', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => Hash::make('password123'),
-            'role_id' => $candidateRole->id,
-            'email_verified_at' => now(),
         ]);
 
         $token1 = $user->createToken('device1')->plainTextToken;
@@ -80,13 +66,9 @@ describe('Refresh Token Endpoint', function () {
     });
 
     it('refreshing token only revokes current token', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
-        $user = User::create([
+        $user = $this->createUserWithRole('Candidate', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => Hash::make('password123'),
-            'role_id' => $candidateRole->id,
-            'email_verified_at' => now(),
         ]);
 
         $token1 = $user->createToken('device1')->plainTextToken;

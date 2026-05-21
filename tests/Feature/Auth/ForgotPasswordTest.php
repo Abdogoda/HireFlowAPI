@@ -1,24 +1,14 @@
 <?php
 
-use App\Models\Role;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-
 describe('Forgot Password Endpoint', function () {
     beforeEach(function () {
-        Role::create(['name' => 'Admin', 'description' => 'Administrator']);
-        Role::create(['name' => 'Recruiter', 'description' => 'Recruiter']);
-        Role::create(['name' => 'Candidate', 'description' => 'Candidate']);
+        $this->createDefaultRoles();
     });
 
     it('sends password reset link', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
-        User::create([
+        $this->createUserWithRole('Candidate', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => Hash::make('password123'),
-            'role_id' => $candidateRole->id,
-            'email_verified_at' => now(),
         ]);
 
         $response = $this->postJson('/api/auth/forgot-password', [

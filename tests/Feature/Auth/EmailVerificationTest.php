@@ -1,23 +1,14 @@
 <?php
 
-use App\Models\Role;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-
 describe('Email Verification Endpoint', function () {
     beforeEach(function () {
-        Role::create(['name' => 'Admin', 'description' => 'Administrator']);
-        Role::create(['name' => 'Recruiter', 'description' => 'Recruiter']);
-        Role::create(['name' => 'Candidate', 'description' => 'Candidate']);
+        $this->createDefaultRoles();
     });
 
     it('verifies email with valid link', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
-        $user = User::create([
+        $user = $this->createUserWithRole('Candidate', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => Hash::make('password123'),
-            'role_id' => $candidateRole->id,
             'email_verified_at' => null,
         ]);
 
@@ -46,12 +37,9 @@ describe('Email Verification Endpoint', function () {
     });
 
     it('fails with invalid hash', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
-        $user = User::create([
+        $user = $this->createUserWithRole('Candidate', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => Hash::make('password123'),
-            'role_id' => $candidateRole->id,
             'email_verified_at' => null,
         ]);
 
@@ -66,13 +54,9 @@ describe('Email Verification Endpoint', function () {
     });
 
     it('already verified email cannot be verified again', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
-        $user = User::create([
+        $user = $this->createUserWithRole('Candidate', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => Hash::make('password123'),
-            'role_id' => $candidateRole->id,
-            'email_verified_at' => now(),
         ]);
 
         $verificationUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
@@ -97,12 +81,9 @@ describe('Email Verification Endpoint', function () {
     });
 
     it('unverified user cannot login', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
-        User::create([
+        $this->createUserWithRole('Candidate', [
             'name' => 'Unverified User',
             'email' => 'unverified@example.com',
-            'password' => Hash::make('password123'),
-            'role_id' => $candidateRole->id,
             'email_verified_at' => null,
         ]);
 
@@ -116,13 +97,9 @@ describe('Email Verification Endpoint', function () {
     });
 
     it('cannot resend verification if already verified', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
-        $user = User::create([
+        $user = $this->createUserWithRole('Candidate', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => Hash::make('password123'),
-            'role_id' => $candidateRole->id,
-            'email_verified_at' => now(),
         ]);
 
         $token = $user->createToken('api-token')->plainTextToken;

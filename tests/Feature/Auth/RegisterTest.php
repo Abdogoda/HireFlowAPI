@@ -1,18 +1,15 @@
 <?php
 
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 describe('Register Endpoint', function () {
     beforeEach(function () {
-        Role::create(['name' => 'Admin', 'description' => 'Administrator']);
-        Role::create(['name' => 'Recruiter', 'description' => 'Recruiter']);
-        Role::create(['name' => 'Candidate', 'description' => 'Candidate']);
+        $this->createDefaultRoles();
     });
 
     it('registers a new user with valid data', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
+        $candidateRole = $this->getRole('Candidate');
 
         $response = $this->postJson('/api/auth/register', [
             'name' => 'John Doe',
@@ -43,7 +40,7 @@ describe('Register Endpoint', function () {
     });
 
     it('fails with invalid email', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
+        $candidateRole = $this->getRole('Candidate');
 
         $response = $this->postJson('/api/auth/register', [
             'name' => 'John Doe',
@@ -57,13 +54,12 @@ describe('Register Endpoint', function () {
     });
 
     it('fails when email already exists', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
-        User::create([
+        $this->createUserWithRole('Candidate', [
             'name' => 'Existing User',
             'email' => 'existing@example.com',
-            'password' => Hash::make('password'),
-            'role_id' => $candidateRole->id,
         ]);
+
+        $candidateRole = $this->getRole('Candidate');
 
         $response = $this->postJson('/api/auth/register', [
             'name' => 'John Doe',
@@ -77,7 +73,7 @@ describe('Register Endpoint', function () {
     });
 
     it('fails when passwords do not match', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
+        $candidateRole = $this->getRole('Candidate');
 
         $response = $this->postJson('/api/auth/register', [
             'name' => 'John Doe',
@@ -91,7 +87,7 @@ describe('Register Endpoint', function () {
     });
 
     it('fails when password is too short', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
+        $candidateRole = $this->getRole('Candidate');
 
         $response = $this->postJson('/api/auth/register', [
             'name' => 'John Doe',
@@ -117,7 +113,7 @@ describe('Register Endpoint', function () {
     });
 
     it('password is hashed in database', function () {
-        $candidateRole = Role::where('name', 'Candidate')->first();
+        $candidateRole = $this->getRole('Candidate');
 
         $this->postJson('/api/auth/register', [
             'name' => 'John Doe',
