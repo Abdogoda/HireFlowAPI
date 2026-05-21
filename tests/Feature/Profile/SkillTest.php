@@ -1,25 +1,13 @@
 <?php
 
-use App\Models\User;
-use App\Models\Role;
-
 describe('Skill Endpoints', function () {
     beforeEach(function () {
-        Role::create(['name' => 'Admin', 'description' => 'Administrator']);
-        Role::create(['name' => 'Recruiter', 'description' => 'Recruiter']);
-        Role::create(['name' => 'Candidate', 'description' => 'Candidate']);
+        $this->createDefaultRoles();
     });
 
     describe('List Skills', function () {
         it('retrieves all skills for authenticated user', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $user->skills()->createMany([
                 ['name' => 'PHP', 'proficiency_level' => 'expert'],
@@ -52,14 +40,7 @@ describe('Skill Endpoints', function () {
         });
 
         it('returns empty array when user has no skills', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $response = $this->actingAs($user)
                 ->getJson('/api/profile/skills');
 
@@ -78,14 +59,7 @@ describe('Skill Endpoints', function () {
 
     describe('Create Skill', function () {
         it('creates a new skill successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $response = $this->actingAs($user)
                 ->postJson('/api/profile/skills', [
@@ -124,14 +98,7 @@ describe('Skill Endpoints', function () {
         });
 
         it('creates multiple skills for same user', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $this->actingAs($user)
                 ->postJson('/api/profile/skills', ['name' => 'PHP', 'proficiency_level' => 'expert'])
                 ->assertStatus(201);
@@ -161,14 +128,7 @@ describe('Skill Endpoints', function () {
         });
 
         it('fails with missing required fields', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $response = $this->actingAs($user)
                 ->postJson('/api/profile/skills', []);
 
@@ -176,14 +136,7 @@ describe('Skill Endpoints', function () {
         });
 
         it('fails with invalid proficiency level', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $response = $this->actingAs($user)
                 ->postJson('/api/profile/skills', [
                     'name' => 'PHP',
@@ -196,14 +149,7 @@ describe('Skill Endpoints', function () {
 
     describe('Get Single Skill', function () {
         it('retrieves a specific skill', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $skill = $user->skills()->create([
                 'name' => 'PHP',
                 'proficiency_level' => 'expert',
@@ -236,20 +182,8 @@ describe('Skill Endpoints', function () {
         });
 
         it('fails when accessing another user\'s skill', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user1 = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
-            $user2 = User::create([
-                'name' => 'Jane Doe',
-                'email' => 'jane@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user1 = $this->createUser(['email' => 'user1@example.com']);
+            $user2 = $this->createUser(['email' => 'user2@example.com']);
 
             $skill = $user1->skills()->create([
                 'name' => 'PHP',
@@ -264,13 +198,8 @@ describe('Skill Endpoints', function () {
         });
 
         it('fails without authentication', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
+
             $skill = $user->skills()->create(['name' => 'PHP', 'proficiency_level' => 'expert']);
 
             $response = $this->getJson("/api/profile/skills/{$skill->id}");
@@ -281,14 +210,7 @@ describe('Skill Endpoints', function () {
 
     describe('Update Skill', function () {
         it('updates a skill successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $skill = $user->skills()->create([
                 'name' => 'PHP',
                 'proficiency_level' => 'intermediate',
@@ -320,14 +242,7 @@ describe('Skill Endpoints', function () {
         });
 
         it('updates only provided fields', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $skill = $user->skills()->create([
                 'name' => 'PHP',
                 'proficiency_level' => 'intermediate',
@@ -348,20 +263,8 @@ describe('Skill Endpoints', function () {
         });
 
         it('fails when updating another user\'s skill', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user1 = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
-            $user2 = User::create([
-                'name' => 'Jane Doe',
-                'email' => 'jane@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user1 = $this->createUser(['email' => 'user1@example.com']);
+            $user2 = $this->createUser(['email' => 'user2@example.com']);
 
             $skill = $user1->skills()->create([
                 'name' => 'PHP',
@@ -378,14 +281,9 @@ describe('Skill Endpoints', function () {
         });
 
         it('fails without authentication', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-            $skill = $user->skills()->create(['name' => 'PHP', 'proficiency_level' => 'expert']);
+            $user = $this->createUser();
+
+            $skill = $user->skills()->create(['name' => 'PHP']);
 
             $response = $this->patchJson("/api/profile/skills/{$skill->id}", [
                 'proficiency_level' => 'expert',
@@ -397,14 +295,7 @@ describe('Skill Endpoints', function () {
 
     describe('Delete Skill', function () {
         it('deletes a skill successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $skill = $user->skills()->create([
                 'name' => 'PHP',
                 'proficiency_level' => 'expert',
@@ -425,20 +316,8 @@ describe('Skill Endpoints', function () {
         });
 
         it('fails when deleting another user\'s skill', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user1 = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
-            $user2 = User::create([
-                'name' => 'Jane Doe',
-                'email' => 'jane@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user1 = $this->createUser(['email' => 'user1@example.com']);
+            $user2 = $this->createUser(['email' => 'user2@example.com']);
 
             $skill = $user1->skills()->create([
                 'name' => 'PHP',
@@ -456,13 +335,8 @@ describe('Skill Endpoints', function () {
         });
 
         it('fails without authentication', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser(); 
+            
             $skill = $user->skills()->create(['name' => 'PHP', 'proficiency_level' => 'expert']);
 
             $response = $this->deleteJson("/api/profile/skills/{$skill->id}");

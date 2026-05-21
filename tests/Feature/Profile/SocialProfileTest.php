@@ -6,21 +6,12 @@ use App\Enums\Users\SocialProfileType;
 
 describe('Social Profile Endpoints', function () {
     beforeEach(function () {
-        Role::create(['name' => 'Admin', 'description' => 'Administrator']);
-        Role::create(['name' => 'Recruiter', 'description' => 'Recruiter']);
-        Role::create(['name' => 'Candidate', 'description' => 'Candidate']);
+        $this->createDefaultRoles();
     });
 
     describe('List Social Profiles', function () {
         it('retrieves all social profiles for authenticated user', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $user->socialProfiles()->createMany([
                 ['social_profile_type' => SocialProfileType::LINKEDIN->value, 'profile_url' => 'https://linkedin.com/in/johndoe'],
@@ -42,14 +33,7 @@ describe('Social Profile Endpoints', function () {
         });
 
         it('returns empty array when user has no social profiles', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $response = $this->actingAs($user)
                 ->getJson('/api/profile/social-profiles');
 
@@ -65,14 +49,7 @@ describe('Social Profile Endpoints', function () {
 
     describe('Create Social Profile', function () {
         it('creates a social profile successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $response = $this->actingAs($user)
                 ->postJson('/api/profile/social-profiles', [
@@ -105,14 +82,7 @@ describe('Social Profile Endpoints', function () {
         });
 
         it('creates multiple social profiles for same user', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $this->actingAs($user)
                 ->postJson('/api/profile/social-profiles', [
                     'social_profile_type' => SocialProfileType::LINKEDIN->value,
@@ -140,14 +110,7 @@ describe('Social Profile Endpoints', function () {
         });
 
         it('fails with missing required fields', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $response = $this->actingAs($user)
                 ->postJson('/api/profile/social-profiles', [
                     'social_profile_type' => SocialProfileType::LINKEDIN->value,
@@ -157,14 +120,7 @@ describe('Social Profile Endpoints', function () {
         });
 
         it('fails with invalid social profile type', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $response = $this->actingAs($user)
                 ->postJson('/api/profile/social-profiles', [
                     'social_profile_type' => 999,
@@ -177,14 +133,7 @@ describe('Social Profile Endpoints', function () {
 
     describe('Get Single Social Profile', function () {
         it('retrieves a specific social profile', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $socialProfile = $user->socialProfiles()->create([
                 'social_profile_type' => SocialProfileType::LINKEDIN->value,
                 'profile_url' => 'https://linkedin.com/in/johndoe',
@@ -215,20 +164,8 @@ describe('Social Profile Endpoints', function () {
         });
 
         it('fails when accessing another user\'s social profile', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user1 = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
-            $user2 = User::create([
-                'name' => 'Jane Doe',
-                'email' => 'jane@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user1 = $this->createUser(['email' => 'user1@example.com']);
+            $user2 = $this->createUser(['email' => 'user2@example.com']);
 
             $socialProfile = $user1->socialProfiles()->create([
                 'social_profile_type' => SocialProfileType::LINKEDIN->value,
@@ -243,13 +180,8 @@ describe('Social Profile Endpoints', function () {
         });
 
         it('fails without authentication', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
+
             $socialProfile = $user->socialProfiles()->create([
                 'social_profile_type' => SocialProfileType::LINKEDIN->value,
                 'profile_url' => 'https://linkedin.com/in/test',
@@ -263,14 +195,7 @@ describe('Social Profile Endpoints', function () {
 
     describe('Update Social Profile', function () {
         it('updates a social profile successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $socialProfile = $user->socialProfiles()->create([
                 'social_profile_type' => SocialProfileType::LINKEDIN->value,
                 'profile_url' => 'https://linkedin.com/in/johndoe',
@@ -294,14 +219,7 @@ describe('Social Profile Endpoints', function () {
         });
 
         it('updates social profile type', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $socialProfile = $user->socialProfiles()->create([
                 'social_profile_type' => SocialProfileType::LINKEDIN->value,
                 'profile_url' => 'https://linkedin.com/in/johndoe',
@@ -323,20 +241,8 @@ describe('Social Profile Endpoints', function () {
         });
 
         it('fails when updating another user\'s social profile', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user1 = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
-            $user2 = User::create([
-                'name' => 'Jane Doe',
-                'email' => 'jane@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user1 = $this->createUser(['email' => 'user1@example.com']);
+            $user2 = $this->createUser(['email' => 'user2@example.com']);
 
             $socialProfile = $user1->socialProfiles()->create([
                 'social_profile_type' => SocialProfileType::LINKEDIN->value,
@@ -353,13 +259,8 @@ describe('Social Profile Endpoints', function () {
         });
 
         it('fails without authentication', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
+            
             $socialProfile = $user->socialProfiles()->create([
                 'social_profile_type' => SocialProfileType::LINKEDIN->value,
                 'profile_url' => 'https://linkedin.com/in/test',
@@ -375,14 +276,7 @@ describe('Social Profile Endpoints', function () {
 
     describe('Delete Social Profile', function () {
         it('deletes a social profile successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $socialProfile = $user->socialProfiles()->create([
                 'social_profile_type' => SocialProfileType::LINKEDIN->value,
                 'profile_url' => 'https://linkedin.com/in/johndoe',
@@ -403,20 +297,8 @@ describe('Social Profile Endpoints', function () {
         });
 
         it('fails when deleting another user\'s social profile', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user1 = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
-            $user2 = User::create([
-                'name' => 'Jane Doe',
-                'email' => 'jane@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user1 = $this->createUser(['email' => 'user1@example.com']);
+            $user2 = $this->createUser(['email' => 'user2@example.com']);
 
             $socialProfile = $user1->socialProfiles()->create([
                 'social_profile_type' => SocialProfileType::LINKEDIN->value,
@@ -434,13 +316,8 @@ describe('Social Profile Endpoints', function () {
         });
 
         it('fails without authentication', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
+            
             $socialProfile = $user->socialProfiles()->create([
                 'social_profile_type' => SocialProfileType::LINKEDIN->value,
                 'profile_url' => 'https://linkedin.com/in/test',

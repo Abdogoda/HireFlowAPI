@@ -1,25 +1,13 @@
 <?php
 
-use App\Models\User;
-use App\Models\Role;
-
 describe('Project Endpoints', function () {
     beforeEach(function () {
-        Role::create(['name' => 'Admin', 'description' => 'Administrator']);
-        Role::create(['name' => 'Recruiter', 'description' => 'Recruiter']);
-        Role::create(['name' => 'Candidate', 'description' => 'Candidate']);
+        $this->createDefaultRoles();
     });
 
     describe('List Projects', function () {
         it('retrieves all projects for authenticated user', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $user->projects()->createMany([
                 [
@@ -68,14 +56,7 @@ describe('Project Endpoints', function () {
         });
 
         it('returns empty array when user has no projects', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $response = $this->actingAs($user)
                 ->getJson('/api/profile/projects');
 
@@ -94,14 +75,7 @@ describe('Project Endpoints', function () {
 
     describe('Create Project', function () {
         it('creates a new project successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $response = $this->actingAs($user)
                 ->postJson('/api/profile/projects', [
@@ -146,14 +120,7 @@ describe('Project Endpoints', function () {
         });
 
         it('creates project with minimal fields', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $response = $this->actingAs($user)
                 ->postJson('/api/profile/projects', [
                     'title' => 'Simple Project',
@@ -172,14 +139,7 @@ describe('Project Endpoints', function () {
         });
 
         it('creates multiple projects for same user', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $this->actingAs($user)
                 ->postJson('/api/profile/projects', [
                     'title' => 'Project 1',
@@ -209,14 +169,7 @@ describe('Project Endpoints', function () {
         });
 
         it('fails with missing title', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $response = $this->actingAs($user)
                 ->postJson('/api/profile/projects', [
                     'start_date' => '2023-01-01',
@@ -226,14 +179,7 @@ describe('Project Endpoints', function () {
         });
 
         it('fails with missing start_date', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $response = $this->actingAs($user)
                 ->postJson('/api/profile/projects', [
                     'title' => 'Test Project',
@@ -244,14 +190,7 @@ describe('Project Endpoints', function () {
         });
 
         it('fails with invalid URL', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $response = $this->actingAs($user)
                 ->postJson('/api/profile/projects', [
                     'title' => 'Test Project',
@@ -265,14 +204,7 @@ describe('Project Endpoints', function () {
 
     describe('Get Single Project', function () {
         it('retrieves a specific project', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $project = $user->projects()->create([
                 'title' => 'Test Project',
                 'description' => 'Test description',
@@ -306,20 +238,8 @@ describe('Project Endpoints', function () {
         });
 
         it('fails when accessing another user\'s project', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user1 = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
-            $user2 = User::create([
-                'name' => 'Jane Doe',
-                'email' => 'jane@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user1 = $this->createUser(['email' => 'user1@example.com']);
+            $user2 = $this->createUser(['email' => 'user2@example.com']);
 
             $project = $user1->projects()->create([
                 'title' => 'Test Project',
@@ -335,13 +255,8 @@ describe('Project Endpoints', function () {
         });
 
         it('fails without authentication', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
+            
             $project = $user->projects()->create([
                 'title' => 'Test Project',
                 'description' => 'Test description',
@@ -356,14 +271,7 @@ describe('Project Endpoints', function () {
 
     describe('Update Project', function () {
         it('updates a project successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $project = $user->projects()->create([
                 'title' => 'Old Title',
                 'description' => 'Old description',
@@ -395,14 +303,7 @@ describe('Project Endpoints', function () {
         });
 
         it('updates only provided fields', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $project = $user->projects()->create([
                 'title' => 'Original Title',
                 'description' => 'Original description',
@@ -425,20 +326,8 @@ describe('Project Endpoints', function () {
         });
 
         it('fails when updating another user\'s project', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user1 = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
-            $user2 = User::create([
-                'name' => 'Jane Doe',
-                'email' => 'jane@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user1 = $this->createUser(['email' => 'user1@example.com']);
+            $user2 = $this->createUser(['email' => 'user2@example.com']);
 
             $project = $user1->projects()->create([
                 'title' => 'Test Project',
@@ -456,13 +345,8 @@ describe('Project Endpoints', function () {
         });
 
         it('fails without authentication', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
+            
             $project = $user->projects()->create([
                 'title' => 'Test Project',
                 'description' => 'Test description',
@@ -479,14 +363,7 @@ describe('Project Endpoints', function () {
 
     describe('Delete Project', function () {
         it('deletes a project successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $project = $user->projects()->create([
                 'title' => 'Test Project',
                 'description' => 'Test description',
@@ -508,20 +385,8 @@ describe('Project Endpoints', function () {
         });
 
         it('fails when deleting another user\'s project', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user1 = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
-            $user2 = User::create([
-                'name' => 'Jane Doe',
-                'email' => 'jane@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user1 = $this->createUser(['email' => 'user1@example.com']);
+            $user2 = $this->createUser(['email' => 'user2@example.com']);
 
             $project = $user1->projects()->create([
                 'title' => 'Test Project',
@@ -540,13 +405,8 @@ describe('Project Endpoints', function () {
         });
 
         it('fails without authentication', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
+            
             $project = $user->projects()->create([
                 'title' => 'Test Project',
                 'description' => 'Test description',

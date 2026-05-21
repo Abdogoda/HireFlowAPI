@@ -7,22 +7,13 @@ use Illuminate\Support\Facades\Storage;
 
 describe('CV/Resume Endpoints', function () {
     beforeEach(function () {
-        Role::create(['name' => 'Admin', 'description' => 'Administrator']);
-        Role::create(['name' => 'Recruiter', 'description' => 'Recruiter']);
-        Role::create(['name' => 'Candidate', 'description' => 'Candidate']);
+        $this->createDefaultRoles();
         Storage::fake('public');
     });
 
     describe('List CVs', function () {
         it('retrieves all CVs for authenticated user', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $response = $this->actingAs($user)
                 ->getJson('/api/profile/cvs');
@@ -49,13 +40,7 @@ describe('CV/Resume Endpoints', function () {
         });
 
         it('returns empty array when user has no CVs', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
 
             $response = $this->actingAs($user)
                 ->getJson('/api/profile/cvs');
@@ -75,14 +60,7 @@ describe('CV/Resume Endpoints', function () {
 
     describe('Upload CV', function () {
         it('uploads a CV successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $file = UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf');
 
@@ -117,13 +95,7 @@ describe('CV/Resume Endpoints', function () {
         });
 
         it('uploads CV with default title', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
 
             $file = UploadedFile::fake()->create('my-cv.pdf', 100, 'application/pdf');
 
@@ -143,13 +115,7 @@ describe('CV/Resume Endpoints', function () {
         });
 
         it('uploads multiple CVs for same user', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
 
             $file1 = UploadedFile::fake()->create('resume1.pdf', 100, 'application/pdf');
             $file2 = UploadedFile::fake()->create('resume2.pdf', 100, 'application/pdf');
@@ -176,13 +142,7 @@ describe('CV/Resume Endpoints', function () {
         });
 
         it('fails with missing file', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
 
             $response = $this->actingAs($user)
                 ->postJson('/api/profile/cvs', [
@@ -214,13 +174,7 @@ describe('CV/Resume Endpoints', function () {
 
     describe('Get Single CV', function () {
         it('retrieves a specific CV', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
 
             $file = UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf');
 
@@ -255,20 +209,8 @@ describe('CV/Resume Endpoints', function () {
         });
 
         it('fails when accessing another user\'s CV', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user1 = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
-            $user2 = User::create([
-                'name' => 'Jane Doe',
-                'email' => 'jane@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user1 = $this->createUser(['email' => 'user1@example.com']);
+            $user2 = $this->createUser(['email' => 'user2@example.com']);
 
             $file = UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf');
 
@@ -287,13 +229,7 @@ describe('CV/Resume Endpoints', function () {
 
     describe('Delete CV', function () {
         it('deletes a CV successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
 
             $file = UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf');
 
@@ -317,20 +253,8 @@ describe('CV/Resume Endpoints', function () {
         });
 
         it('fails when deleting another user\'s CV', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user1 = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
-            $user2 = User::create([
-                'name' => 'Jane Doe',
-                'email' => 'jane@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user1 = $this->createUser(['email' => 'user1@gmail.com']);
+            $user2 = $this->createUser(['email' => 'user2@gmail.com']);
 
             $file = UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf');
 

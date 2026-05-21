@@ -7,21 +7,13 @@ use Illuminate\Support\Facades\Storage;
 
 describe('Profile Endpoints', function () {
     beforeEach(function () {
+        $this->createDefaultRoles();    
         Storage::fake('public');
-        Role::create(['name' => 'Admin', 'description' => 'Administrator']);
-        Role::create(['name' => 'Recruiter', 'description' => 'Recruiter']);
-        Role::create(['name' => 'Candidate', 'description' => 'Candidate']);
     });
 
     describe('Get Profile', function () {
         it('retrieves authenticated user profile', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
+            $user = $this->createUser([
                 'bio' => 'Test bio',
                 'phone_number' => '1234567890',
                 'address' => '123 Main St',
@@ -62,10 +54,10 @@ describe('Profile Endpoints', function () {
                     'message' => 'Profile retrieved successfully',
                     'data' => [
                         'profile' => [
-                            'name' => 'John Doe',
-                            'email' => 'john@example.com',
-                            'bio' => 'Test bio',
-                            'phone_number' => '1234567890',
+                            'name' => $user->name,
+                            'email' => $user->email,
+                            'bio' => $user->bio,
+                            'phone_number' => $user->phone_number,
                         ],
                     ],
                 ]);
@@ -80,14 +72,7 @@ describe('Profile Endpoints', function () {
 
     describe('Update Profile', function () {
         it('updates user profile with valid data', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $response = $this->actingAs($user)
                 ->patchJson('/api/profile', [
@@ -139,12 +124,7 @@ describe('Profile Endpoints', function () {
         });
 
         it('updates only provided fields', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
+            $user = $this->createUser([
                 'bio' => 'Original bio',
             ]);
 
@@ -180,14 +160,7 @@ describe('Profile Endpoints', function () {
 
     describe('Upload Avatar', function () {
         it('uploads avatar successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $file = UploadedFile::fake()->image('avatar.jpg', 100, 100);
 
@@ -211,14 +184,7 @@ describe('Profile Endpoints', function () {
         });
 
         it('deletes old avatar when uploading new one', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $oldFile = UploadedFile::fake()->image('old_avatar.jpg');
             $oldPath = $oldFile->store('avatars', 'public');
@@ -262,14 +228,7 @@ describe('Profile Endpoints', function () {
 
     describe('Delete Avatar', function () {
         it('deletes avatar successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $file = UploadedFile::fake()->image('avatar.jpg');
             $path = $file->store('avatars', 'public');
@@ -291,14 +250,7 @@ describe('Profile Endpoints', function () {
         });
 
         it('handles deletion when no avatar exists', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
-
+            $user = $this->createUser();
             $response = $this->actingAs($user)
                 ->deleteJson('/api/profile/avatar');
 
@@ -318,14 +270,7 @@ describe('Profile Endpoints', function () {
 
     describe('Upload Profile Picture', function () {
         it('uploads profile picture successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-                'email_verified_at' => now(),
-            ]);
+            $user = $this->createUser();
 
             $file = UploadedFile::fake()->image('profile.jpg', 500, 500);
 
@@ -345,13 +290,7 @@ describe('Profile Endpoints', function () {
         });
 
         it('uploads thumbnail successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
 
             $file = UploadedFile::fake()->image('thumbnail.jpg');
 
@@ -369,13 +308,7 @@ describe('Profile Endpoints', function () {
         });
 
         it('requires type parameter', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
 
             $file = UploadedFile::fake()->image('picture.jpg');
 
@@ -390,13 +323,7 @@ describe('Profile Endpoints', function () {
 
     describe('Delete Profile Picture', function () {
         it('deletes profile picture successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
 
             $file = UploadedFile::fake()->image('profile.jpg');
             $path = $file->store('profile-pictures', 'public');
@@ -420,13 +347,7 @@ describe('Profile Endpoints', function () {
         });
 
         it('deletes thumbnail successfully', function () {
-            $role = Role::where('name', 'Candidate')->first();
-            $user = User::create([
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => $role->id,
-            ]);
+            $user = $this->createUser();
 
             $file = UploadedFile::fake()->image('thumbnail.jpg');
             $path = $file->store('thumbnails', 'public');
