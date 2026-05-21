@@ -2,7 +2,7 @@
 
 namespace App\Enums\Authorization;
 
-use App\Traits\Enums\BaseEnum;
+use App\Traits\BaseEnum;
 
 enum Roles: string
 {

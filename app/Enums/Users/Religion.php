@@ -2,7 +2,7 @@
 
 namespace App\Enums\Users;
 
-use App\Traits\Enums\BaseEnum;
+use App\Traits\BaseEnum;
 
 enum Religion: int
 {

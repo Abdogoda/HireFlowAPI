@@ -2,7 +2,7 @@
 
 namespace App\Enums\Documents;
 
-use App\Traits\Enums\BaseEnum;
+use App\Traits\BaseEnum;
 
 enum DocumentType: string
 {

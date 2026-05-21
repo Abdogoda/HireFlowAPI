@@ -50,7 +50,7 @@ describe('Refresh Token Endpoint', function () {
 
         // New token should work
         $this->withHeader('Authorization', "Bearer $newToken")
-            ->getJson('/api/user')
+            ->getJson('/api/profile')
             ->assertStatus(200);
     });
 
@@ -72,8 +72,8 @@ describe('Refresh Token Endpoint', function () {
         $token1 = $user->createToken('device1')->plainTextToken;
         $token2 = $user->createToken('device2')->plainTextToken;
 
-        $response1 = $this->withHeader('Authorization', "Bearer $token1")->getJson('/api/user');
-        $response2 = $this->withHeader('Authorization', "Bearer $token2")->getJson('/api/user');
+        $response1 = $this->withHeader('Authorization', "Bearer $token1")->getJson('/api/profile');
+        $response2 = $this->withHeader('Authorization', "Bearer $token2")->getJson('/api/profile');
 
         $response1->assertStatus(200);
         $response2->assertStatus(200);
@@ -106,13 +106,13 @@ describe('Refresh Token Endpoint', function () {
 
         // Token2 should still work
         $this->withHeader('Authorization', "Bearer $token2")
-            ->getJson('/api/user')
+            ->getJson('/api/profile')
             ->assertStatus(200);
 
         $newToken = $response->json('token');
         // New token should work
         $this->withHeader('Authorization', "Bearer $newToken")
-            ->getJson('/api/user')
+            ->getJson('/api/profile')
             ->assertStatus(200);
     });
 });
