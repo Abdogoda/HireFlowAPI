@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'file_name', 'file_path', 'is_primary'])]
+#[Fillable(['user_id', 'title', 'file_name', 'file_path', 'file_url', 'is_primary'])]
 class Resume extends Model
 {
     protected function casts(): array
