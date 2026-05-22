@@ -1,0 +1,989 @@
+<?php
+
+namespace App\Support;
+
+final class OpenApiSpec
+{
+    public static function make(): array
+    {
+        return [
+            'openapi' => '3.0.3',
+            'info' => [
+                'title' => 'HireFlow API',
+                'version' => '1.0.0',
+                'description' => 'Swagger documentation for the HireFlow API.',
+            ],
+            'servers' => [
+                [
+                    'url' => '/api',
+                    'description' => 'API base path',
+                ],
+            ],
+            'tags' => [
+                ['name' => 'Auth', 'description' => 'Authentication and account lifecycle endpoints'],
+                ['name' => 'Profile', 'description' => 'Authenticated profile and portfolio endpoints'],
+            ],
+            'paths' => self::paths(),
+            'components' => [
+                'securitySchemes' => [
+                    'bearerAuth' => [
+                        'type' => 'http',
+                        'scheme' => 'bearer',
+                        'bearerFormat' => 'JWT',
+                    ],
+                ],
+                'schemas' => [
+                    'ApiSuccessResponse' => [
+                        'type' => 'object',
+                        'required' => ['success', 'message', 'data', 'timestamp'],
+                        'properties' => [
+                            'success' => ['type' => 'boolean', 'example' => true],
+                            'message' => ['type' => 'string', 'example' => 'Operation successful'],
+                            'data' => ['nullable' => true, 'type' => ['object', 'array', 'null']],
+                            'timestamp' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'ApiErrorResponse' => [
+                        'type' => 'object',
+                        'required' => ['success', 'message', 'timestamp'],
+                        'properties' => [
+                            'success' => ['type' => 'boolean', 'example' => false],
+                            'message' => ['type' => 'string', 'example' => 'Validation failed'],
+                            'errors' => ['nullable' => true, 'type' => ['object', 'array', 'null']],
+                            'data' => ['nullable' => true, 'type' => ['object', 'array', 'null']],
+                            'timestamp' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'Role' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'name' => ['type' => 'string', 'example' => 'candidate'],
+                            'description' => ['type' => 'string', 'nullable' => true, 'example' => 'Default candidate role'],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'updated_at' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'UserSimple' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'name' => ['type' => 'string', 'example' => 'Jane Doe'],
+                            'email' => ['type' => 'string', 'format' => 'email', 'example' => 'jane@example.com'],
+                            'avatar' => ['type' => 'string', 'nullable' => true, 'example' => 'avatars/jane.jpg'],
+                            'bio' => ['type' => 'string', 'nullable' => true, 'example' => 'Product designer and frontend developer.'],
+                            'email_verified_at' => ['type' => 'string', 'nullable' => true, 'format' => 'date-time'],
+                            'role' => ['$ref' => '#/components/schemas/Role'],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'UserProfile' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'name' => ['type' => 'string', 'example' => 'Jane Doe'],
+                            'email' => ['type' => 'string', 'format' => 'email', 'example' => 'jane@example.com'],
+                            'avatar' => ['type' => 'string', 'nullable' => true, 'example' => 'avatars/jane.jpg'],
+                            'bio' => ['type' => 'string', 'nullable' => true, 'example' => 'Product designer and frontend developer.'],
+                            'phone_number' => ['type' => 'string', 'nullable' => true, 'example' => '+1 555 0100'],
+                            'address' => ['type' => 'string', 'nullable' => true, 'example' => '100 Main Street'],
+                            'city' => ['type' => 'string', 'nullable' => true, 'example' => 'Boston'],
+                            'state' => ['type' => 'string', 'nullable' => true, 'example' => 'MA'],
+                            'country' => ['type' => 'string', 'nullable' => true, 'example' => 'USA'],
+                            'gender' => ['type' => 'string', 'nullable' => true, 'example' => 'female'],
+                            'marital_status' => ['type' => 'string', 'nullable' => true, 'example' => 'single'],
+                            'religion' => ['type' => 'string', 'nullable' => true, 'example' => 'None'],
+                            'email_verified_at' => ['type' => 'string', 'nullable' => true, 'format' => 'date-time'],
+                            'role' => ['$ref' => '#/components/schemas/Role'],
+                            'skills' => [
+                                'type' => 'array',
+                                'items' => ['$ref' => '#/components/schemas/Skill'],
+                            ],
+                            'experiences' => [
+                                'type' => 'array',
+                                'items' => ['type' => 'object'],
+                            ],
+                            'projects' => [
+                                'type' => 'array',
+                                'items' => ['$ref' => '#/components/schemas/Project'],
+                            ],
+                            'resumes' => [
+                                'type' => 'array',
+                                'items' => ['$ref' => '#/components/schemas/Resume'],
+                            ],
+                            'social_profiles' => [
+                                'type' => 'array',
+                                'items' => ['$ref' => '#/components/schemas/SocialProfile'],
+                            ],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'updated_at' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'Skill' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'name' => ['type' => 'string', 'example' => 'Laravel'],
+                            'proficiency_level' => ['type' => 'string', 'nullable' => true, 'example' => 'advanced'],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'updated_at' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'Project' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'title' => ['type' => 'string', 'example' => 'HireFlow API'],
+                            'description' => ['type' => 'string', 'example' => 'A recruiting platform API'],
+                            'url' => ['type' => 'string', 'nullable' => true, 'format' => 'uri', 'example' => 'https://example.com'],
+                            'technologies' => ['type' => 'string', 'nullable' => true, 'example' => 'Laravel, PostgreSQL'],
+                            'start_date' => ['type' => 'string', 'format' => 'date', 'example' => '2026-01-01'],
+                            'end_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-06-01'],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'updated_at' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'Resume' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'title' => ['type' => 'string', 'nullable' => true, 'example' => 'Backend CV'],
+                            'file_name' => ['type' => 'string', 'example' => 'backend-cv.pdf'],
+                            'file_path' => ['type' => 'string', 'example' => 'resumes/backend-cv.pdf'],
+                            'file_url' => ['type' => 'string', 'format' => 'uri', 'example' => 'https://example.com/storage/resumes/backend-cv.pdf'],
+                            'is_primary' => ['type' => 'boolean', 'example' => true],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'updated_at' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'SocialProfile' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'social_profile_type' => ['type' => 'integer', 'example' => 1],
+                            'profile_url' => ['type' => 'string', 'format' => 'uri', 'example' => 'https://linkedin.com/in/janedoe'],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'updated_at' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'LoginRequest' => [
+                        'type' => 'object',
+                        'required' => ['email', 'password'],
+                        'properties' => [
+                            'email' => ['type' => 'string', 'format' => 'email', 'example' => 'jane@example.com'],
+                            'password' => ['type' => 'string', 'example' => 'password123'],
+                        ],
+                    ],
+                    'RegisterRequest' => [
+                        'type' => 'object',
+                        'required' => ['name', 'email', 'password', 'password_confirmation', 'role_id'],
+                        'properties' => [
+                            'name' => ['type' => 'string', 'example' => 'Jane Doe'],
+                            'email' => ['type' => 'string', 'format' => 'email', 'example' => 'jane@example.com'],
+                            'password' => ['type' => 'string', 'format' => 'password', 'example' => 'password123'],
+                            'password_confirmation' => ['type' => 'string', 'format' => 'password', 'example' => 'password123'],
+                            'role_id' => ['type' => 'integer', 'example' => 1],
+                        ],
+                    ],
+                    'ForgotPasswordRequest' => [
+                        'type' => 'object',
+                        'required' => ['email'],
+                        'properties' => [
+                            'email' => ['type' => 'string', 'format' => 'email', 'example' => 'jane@example.com'],
+                        ],
+                    ],
+                    'ResetPasswordRequest' => [
+                        'type' => 'object',
+                        'required' => ['token', 'email', 'password', 'password_confirmation'],
+                        'properties' => [
+                            'token' => ['type' => 'string', 'example' => 'reset-token-here'],
+                            'email' => ['type' => 'string', 'format' => 'email', 'example' => 'jane@example.com'],
+                            'password' => ['type' => 'string', 'format' => 'password', 'example' => 'newpassword123'],
+                            'password_confirmation' => ['type' => 'string', 'format' => 'password', 'example' => 'newpassword123'],
+                        ],
+                    ],
+                    'UpdateProfileRequest' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => ['type' => 'string', 'example' => 'Jane Doe'],
+                            'bio' => ['type' => 'string', 'nullable' => true, 'example' => 'Product designer and frontend developer.'],
+                            'phone_number' => ['type' => 'string', 'nullable' => true, 'example' => '+1 555 0100'],
+                            'address' => ['type' => 'string', 'nullable' => true, 'example' => '100 Main Street'],
+                            'city' => ['type' => 'string', 'nullable' => true, 'example' => 'Boston'],
+                            'state' => ['type' => 'string', 'nullable' => true, 'example' => 'MA'],
+                            'country' => ['type' => 'string', 'nullable' => true, 'example' => 'USA'],
+                            'gender' => ['type' => 'string', 'nullable' => true, 'enum' => ['male', 'female', 'other']],
+                            'marital_status' => ['type' => 'string', 'nullable' => true, 'enum' => ['single', 'married', 'divorced', 'widowed']],
+                            'religion' => ['type' => 'string', 'nullable' => true, 'example' => 'None'],
+                        ],
+                    ],
+                    'PictureUploadRequest' => [
+                        'type' => 'object',
+                        'required' => ['picture', 'type'],
+                        'properties' => [
+                            'picture' => ['type' => 'string', 'format' => 'binary'],
+                            'type' => ['type' => 'string', 'enum' => ['profile', 'thumbnail']],
+                        ],
+                    ],
+                    'AvatarUploadRequest' => [
+                        'type' => 'object',
+                        'required' => ['avatar'],
+                        'properties' => [
+                            'avatar' => ['type' => 'string', 'format' => 'binary'],
+                        ],
+                    ],
+                    'CvUploadRequest' => [
+                        'type' => 'object',
+                        'required' => ['file'],
+                        'properties' => [
+                            'file' => ['type' => 'string', 'format' => 'binary'],
+                            'title' => ['type' => 'string', 'nullable' => true, 'example' => 'Backend CV'],
+                        ],
+                    ],
+                    'StoreProjectRequest' => [
+                        'type' => 'object',
+                        'required' => ['title', 'description', 'start_date'],
+                        'properties' => [
+                            'title' => ['type' => 'string', 'example' => 'HireFlow API'],
+                            'description' => ['type' => 'string', 'example' => 'A recruiting platform API'],
+                            'url' => ['type' => 'string', 'nullable' => true, 'format' => 'uri', 'example' => 'https://example.com'],
+                            'start_date' => ['type' => 'string', 'format' => 'date', 'example' => '2026-01-01'],
+                            'end_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-06-01'],
+                            'technologies' => ['type' => 'string', 'nullable' => true, 'example' => 'Laravel, PostgreSQL'],
+                        ],
+                    ],
+                    'UpdateProjectRequest' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'title' => ['type' => 'string', 'example' => 'HireFlow API'],
+                            'description' => ['type' => 'string', 'example' => 'A recruiting platform API'],
+                            'url' => ['type' => 'string', 'nullable' => true, 'format' => 'uri', 'example' => 'https://example.com'],
+                            'start_date' => ['type' => 'string', 'format' => 'date', 'example' => '2026-01-01'],
+                            'end_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-06-01'],
+                            'technologies' => ['type' => 'string', 'nullable' => true, 'example' => 'Laravel, PostgreSQL'],
+                        ],
+                    ],
+                    'StoreSkillRequest' => [
+                        'type' => 'object',
+                        'required' => ['name'],
+                        'properties' => [
+                            'name' => ['type' => 'string', 'example' => 'Laravel'],
+                            'proficiency_level' => ['type' => 'string', 'nullable' => true, 'enum' => ['beginner', 'intermediate', 'advanced', 'expert']],
+                            'years_of_experience' => ['type' => 'number', 'nullable' => true, 'example' => 4],
+                            'endorsement_count' => ['type' => 'integer', 'nullable' => true, 'example' => 12],
+                        ],
+                    ],
+                    'UpdateSkillRequest' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => ['type' => 'string', 'example' => 'Laravel'],
+                            'proficiency_level' => ['type' => 'string', 'nullable' => true, 'enum' => ['beginner', 'intermediate', 'advanced', 'expert']],
+                            'years_of_experience' => ['type' => 'number', 'nullable' => true, 'example' => 4],
+                            'endorsement_count' => ['type' => 'integer', 'nullable' => true, 'example' => 12],
+                        ],
+                    ],
+                    'StoreSocialProfileRequest' => [
+                        'type' => 'object',
+                        'required' => ['social_profile_type', 'profile_url'],
+                        'properties' => [
+                            'social_profile_type' => ['type' => 'integer', 'enum' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'example' => 1],
+                            'profile_url' => ['type' => 'string', 'format' => 'uri', 'example' => 'https://linkedin.com/in/janedoe'],
+                        ],
+                    ],
+                    'UpdateSocialProfileRequest' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'social_profile_type' => ['type' => 'integer', 'enum' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'example' => 1],
+                            'profile_url' => ['type' => 'string', 'format' => 'uri', 'example' => 'https://linkedin.com/in/janedoe'],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    private static function paths(): array
+    {
+        return [
+            '/auth/register' => [
+                'post' => self::operation(
+                    'Register a new user',
+                    'Auth',
+                    self::requestBody('#/components/schemas/RegisterRequest'),
+                    self::success('User registered successfully. Please verify your email.', [
+                        'user' => self::userSimpleExample(),
+                    ], 201),
+                    [
+                        '400' => self::error('Validation failed'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                ),
+            ],
+            '/auth/login' => [
+                'post' => self::operation(
+                    'Authenticate an existing user',
+                    'Auth',
+                    self::requestBody('#/components/schemas/LoginRequest'),
+                    self::success('Login successful', [
+                        'user' => self::userSimpleExample(),
+                        'token' => '1|example-token',
+                    ]),
+                    [
+                        '401' => self::error('Invalid credentials'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                ),
+            ],
+            '/auth/forgot-password' => [
+                'post' => self::operation(
+                    'Send a password reset link',
+                    'Auth',
+                    self::requestBody('#/components/schemas/ForgotPasswordRequest'),
+                    self::success('Password reset link sent to your email', null),
+                    [
+                        '404' => self::error('We could not find a user with that email address.'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                ),
+            ],
+            '/auth/reset-password' => [
+                'post' => self::operation(
+                    'Reset a password using a token',
+                    'Auth',
+                    self::requestBody('#/components/schemas/ResetPasswordRequest'),
+                    self::success('Password reset successfully', null),
+                    [
+                        '404' => self::error('We could not find a user with that email address.'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                ),
+            ],
+            '/auth/verify-email/{id}/{hash}' => [
+                'get' => self::operation(
+                    'Verify a user email address',
+                    'Auth',
+                    null,
+                    self::success('Email verified successfully', null),
+                    [
+                        '401' => self::error('Invalid signature or unauthenticated request'),
+                        '403' => self::error('Invalid verification link'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    false,
+                    [
+                        self::parameter('id', 'path', 'string', 'User id'),
+                        self::parameter('hash', 'path', 'string', 'Signed verification hash'),
+                    ],
+                    'The verification link must be signed and will expire according to the application settings.',
+                ),
+            ],
+            '/auth/logout' => [
+                'post' => self::operation(
+                    'Revoke the current access token',
+                    'Auth',
+                    null,
+                    self::success('Logout successful', null),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                ),
+            ],
+            '/auth/refresh-token' => [
+                'post' => self::operation(
+                    'Refresh the current access token',
+                    'Auth',
+                    null,
+                    self::success('Token refreshed successfully', [
+                        'token' => '1|refreshed-token',
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                ),
+            ],
+            '/auth/resend-verification-email' => [
+                'post' => self::operation(
+                    'Resend the email verification link',
+                    'Auth',
+                    null,
+                    self::success('Verification email sent', null),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                ),
+            ],
+            '/profile' => [
+                'get' => self::operation(
+                    'Get the authenticated user profile',
+                    'Profile',
+                    null,
+                    self::success('Profile retrieved successfully', [
+                        'profile' => self::userProfileExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                ),
+                'patch' => self::operation(
+                    'Update the authenticated user profile',
+                    'Profile',
+                    self::requestBody('#/components/schemas/UpdateProfileRequest'),
+                    self::success('Profile updated successfully', [
+                        'profile' => self::userProfileExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                ),
+            ],
+            '/profile/avatar' => [
+                'post' => self::operation(
+                    'Upload a profile avatar',
+                    'Profile',
+                    self::multipartBody('#/components/schemas/AvatarUploadRequest'),
+                    self::success('Avatar uploaded successfully', [
+                        'url' => 'https://example.com/storage/avatars/jane.jpg',
+                    ], 201),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                ),
+                'delete' => self::operation(
+                    'Delete the current profile avatar',
+                    'Profile',
+                    null,
+                    self::success('Avatar deleted successfully', null),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                ),
+            ],
+            '/profile/picture' => [
+                'post' => self::operation(
+                    'Upload a profile picture or thumbnail',
+                    'Profile',
+                    self::multipartBody('#/components/schemas/PictureUploadRequest'),
+                    self::success('Picture uploaded successfully', [
+                        'url' => 'https://example.com/storage/profile-picture.jpg',
+                    ], 201),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                ),
+                'delete' => self::operation(
+                    'Delete a profile picture or thumbnail',
+                    'Profile',
+                    null,
+                    self::success('Picture deleted successfully', null),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                ),
+            ],
+            '/profile/cvs' => [
+                'get' => self::operation(
+                    'List the authenticated user CVs',
+                    'Profile',
+                    null,
+                    self::success('CVs retrieved successfully', [
+                        'cvs' => [self::resumeExample()],
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                ),
+                'post' => self::operation(
+                    'Upload a CV or resume',
+                    'Profile',
+                    self::multipartBody('#/components/schemas/CvUploadRequest'),
+                    self::success('CV uploaded successfully', [
+                        'cv' => self::resumeExample(),
+                    ], 201),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                ),
+            ],
+            '/profile/cvs/{cv}' => [
+                'get' => self::operation(
+                    'Get a specific CV or resume',
+                    'Profile',
+                    null,
+                    self::success('CV retrieved successfully', [
+                        'cv' => self::resumeExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to view this CV'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('cv', 'path', 'integer', 'CV id')],
+                ),
+                'delete' => self::operation(
+                    'Delete a CV or resume',
+                    'Profile',
+                    null,
+                    self::success('CV deleted successfully', null),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to delete this CV'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('cv', 'path', 'integer', 'CV id')],
+                ),
+            ],
+            '/profile/projects' => [
+                'get' => self::operation(
+                    'List the authenticated user projects',
+                    'Profile',
+                    null,
+                    self::success('Projects retrieved successfully', [
+                        'projects' => [self::projectExample()],
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                ),
+                'post' => self::operation(
+                    'Create a project',
+                    'Profile',
+                    self::requestBody('#/components/schemas/StoreProjectRequest'),
+                    self::success('Project created successfully', [
+                        'project' => self::projectExample(),
+                    ], 201),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                ),
+            ],
+            '/profile/projects/{project}' => [
+                'get' => self::operation(
+                    'Get a specific project',
+                    'Profile',
+                    null,
+                    self::success('Project retrieved successfully', [
+                        'project' => self::projectExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to view this project'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('project', 'path', 'integer', 'Project id')],
+                ),
+                'patch' => self::operation(
+                    'Update a project',
+                    'Profile',
+                    self::requestBody('#/components/schemas/UpdateProjectRequest'),
+                    self::success('Project updated successfully', [
+                        'project' => self::projectExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to update this project'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                    [self::parameter('project', 'path', 'integer', 'Project id')],
+                ),
+                'delete' => self::operation(
+                    'Delete a project',
+                    'Profile',
+                    null,
+                    self::success('Project deleted successfully', null),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to delete this project'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('project', 'path', 'integer', 'Project id')],
+                ),
+            ],
+            '/profile/skills' => [
+                'get' => self::operation(
+                    'List the authenticated user skills',
+                    'Profile',
+                    null,
+                    self::success('Skills retrieved successfully', [
+                        'skills' => [self::skillExample()],
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                ),
+                'post' => self::operation(
+                    'Create a skill',
+                    'Profile',
+                    self::requestBody('#/components/schemas/StoreSkillRequest'),
+                    self::success('Skill created successfully', [
+                        'skill' => self::skillExample(),
+                    ], 201),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                ),
+            ],
+            '/profile/skills/{skill}' => [
+                'get' => self::operation(
+                    'Get a specific skill',
+                    'Profile',
+                    null,
+                    self::success('Skill retrieved successfully', [
+                        'skill' => self::skillExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to view this skill'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('skill', 'path', 'integer', 'Skill id')],
+                ),
+                'patch' => self::operation(
+                    'Update a skill',
+                    'Profile',
+                    self::requestBody('#/components/schemas/UpdateSkillRequest'),
+                    self::success('Skill updated successfully', [
+                        'skill' => self::skillExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to update this skill'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                    [self::parameter('skill', 'path', 'integer', 'Skill id')],
+                ),
+                'delete' => self::operation(
+                    'Delete a skill',
+                    'Profile',
+                    null,
+                    self::success('Skill deleted successfully', null),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to delete this skill'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('skill', 'path', 'integer', 'Skill id')],
+                ),
+            ],
+            '/profile/social-profiles' => [
+                'get' => self::operation(
+                    'List the authenticated user social profiles',
+                    'Profile',
+                    null,
+                    self::success('Social profiles retrieved successfully', [
+                        'social_profiles' => [self::socialProfileExample()],
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                ),
+                'post' => self::operation(
+                    'Create a social profile',
+                    'Profile',
+                    self::requestBody('#/components/schemas/StoreSocialProfileRequest'),
+                    self::success('Social profile created successfully', [
+                        'social_profile' => self::socialProfileExample(),
+                    ], 201),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                ),
+            ],
+            '/profile/social-profiles/{socialProfile}' => [
+                'get' => self::operation(
+                    'Get a specific social profile',
+                    'Profile',
+                    null,
+                    self::success('Social profile retrieved successfully', [
+                        'social_profile' => self::socialProfileExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to view this social profile'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('socialProfile', 'path', 'integer', 'Social profile id')],
+                ),
+                'patch' => self::operation(
+                    'Update a social profile',
+                    'Profile',
+                    self::requestBody('#/components/schemas/UpdateSocialProfileRequest'),
+                    self::success('Social profile updated successfully', [
+                        'social_profile' => self::socialProfileExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to update this social profile'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                    [self::parameter('socialProfile', 'path', 'integer', 'Social profile id')],
+                ),
+                'delete' => self::operation(
+                    'Delete a social profile',
+                    'Profile',
+                    null,
+                    self::success('Social profile deleted successfully', null),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to delete this social profile'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('socialProfile', 'path', 'integer', 'Social profile id')],
+                ),
+            ],
+        ];
+    }
+
+    private static function operation(
+        string $summary,
+        string $tag,
+        ?array $requestBody,
+        array $successResponse,
+        array $errorResponses,
+        bool $secured = false,
+        array $parameters = [],
+        ?string $description = null,
+    ): array {
+        $successStatusCode = $successResponse['statusCode'] ?? 200;
+        $successContent = $successResponse['response'] ?? $successResponse;
+
+        $operation = [
+            'tags' => [$tag],
+            'summary' => $summary,
+            'description' => $description ?? $summary,
+            'responses' => [
+                (string) $successStatusCode => $successContent,
+            ] + $errorResponses,
+        ];
+
+        if ($secured) {
+            $operation['security'] = [['bearerAuth' => []]];
+        }
+
+        if ($requestBody !== null) {
+            $operation['requestBody'] = $requestBody;
+        }
+
+        if ($parameters !== []) {
+            $operation['parameters'] = $parameters;
+        }
+
+        return $operation;
+    }
+
+    private static function requestBody(string $schemaRef): array
+    {
+        return [
+            'required' => true,
+            'content' => [
+                'application/json' => [
+                    'schema' => ['$ref' => $schemaRef],
+                ],
+            ],
+        ];
+    }
+
+    private static function multipartBody(string $schemaRef): array
+    {
+        return [
+            'required' => true,
+            'content' => [
+                'multipart/form-data' => [
+                    'schema' => ['$ref' => $schemaRef],
+                ],
+            ],
+        ];
+    }
+
+    private static function success(string $message, ?array $data, int $statusCode = 200): array
+    {
+        return [
+            'statusCode' => $statusCode,
+            'response' => [
+                'description' => $message,
+                'content' => [
+                    'application/json' => [
+                        'schema' => ['$ref' => '#/components/schemas/ApiSuccessResponse'],
+                        'example' => [
+                            'success' => true,
+                            'message' => $message,
+                            'data' => $data,
+                            'timestamp' => '2026-05-22T00:00:00+00:00',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    private static function error(string $message): array
+    {
+        return [
+            'description' => $message,
+            'content' => [
+                'application/json' => [
+                    'schema' => ['$ref' => '#/components/schemas/ApiErrorResponse'],
+                    'example' => [
+                        'success' => false,
+                        'message' => $message,
+                        'errors' => null,
+                        'data' => null,
+                        'timestamp' => '2026-05-22T00:00:00+00:00',
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    private static function parameter(string $name, string $in, string $type, string $description): array
+    {
+        return [
+            'name' => $name,
+            'in' => $in,
+            'required' => true,
+            'description' => $description,
+            'schema' => [
+                'type' => $type,
+            ],
+        ];
+    }
+
+    private static function userSimpleExample(): array
+    {
+        return [
+            'id' => 1,
+            'name' => 'Jane Doe',
+            'email' => 'jane@example.com',
+            'avatar' => 'avatars/jane.jpg',
+            'bio' => 'Product designer and frontend developer.',
+            'email_verified_at' => '2026-05-22T00:00:00+00:00',
+            'role' => [
+                'id' => 1,
+                'name' => 'candidate',
+                'description' => 'Default candidate role',
+                'created_at' => '2026-05-22T00:00:00+00:00',
+                'updated_at' => '2026-05-22T00:00:00+00:00',
+            ],
+            'created_at' => '2026-05-22T00:00:00+00:00',
+        ];
+    }
+
+    private static function userProfileExample(): array
+    {
+        return [
+            'id' => 1,
+            'name' => 'Jane Doe',
+            'email' => 'jane@example.com',
+            'avatar' => 'avatars/jane.jpg',
+            'bio' => 'Product designer and frontend developer.',
+            'phone_number' => '+1 555 0100',
+            'address' => '100 Main Street',
+            'city' => 'Boston',
+            'state' => 'MA',
+            'country' => 'USA',
+            'gender' => 'female',
+            'marital_status' => 'single',
+            'religion' => 'None',
+            'email_verified_at' => '2026-05-22T00:00:00+00:00',
+            'role' => [
+                'id' => 1,
+                'name' => 'candidate',
+                'description' => 'Default candidate role',
+                'created_at' => '2026-05-22T00:00:00+00:00',
+                'updated_at' => '2026-05-22T00:00:00+00:00',
+            ],
+            'skills' => [self::skillExample()],
+            'experiences' => [],
+            'projects' => [self::projectExample()],
+            'resumes' => [self::resumeExample()],
+            'social_profiles' => [self::socialProfileExample()],
+            'created_at' => '2026-05-22T00:00:00+00:00',
+            'updated_at' => '2026-05-22T00:00:00+00:00',
+        ];
+    }
+
+    private static function skillExample(): array
+    {
+        return [
+            'id' => 1,
+            'name' => 'Laravel',
+            'proficiency_level' => 'advanced',
+            'created_at' => '2026-05-22T00:00:00+00:00',
+            'updated_at' => '2026-05-22T00:00:00+00:00',
+        ];
+    }
+
+    private static function projectExample(): array
+    {
+        return [
+            'id' => 1,
+            'title' => 'HireFlow API',
+            'description' => 'A recruiting platform API',
+            'url' => 'https://example.com',
+            'technologies' => 'Laravel, PostgreSQL',
+            'start_date' => '2026-01-01',
+            'end_date' => '2026-06-01',
+            'created_at' => '2026-05-22T00:00:00+00:00',
+            'updated_at' => '2026-05-22T00:00:00+00:00',
+        ];
+    }
+
+    private static function resumeExample(): array
+    {
+        return [
+            'id' => 1,
+            'title' => 'Backend CV',
+            'file_name' => 'backend-cv.pdf',
+            'file_path' => 'resumes/backend-cv.pdf',
+            'file_url' => 'https://example.com/storage/resumes/backend-cv.pdf',
+            'is_primary' => true,
+            'created_at' => '2026-05-22T00:00:00+00:00',
+            'updated_at' => '2026-05-22T00:00:00+00:00',
+        ];
+    }
+
+    private static function socialProfileExample(): array
+    {
+        return [
+            'id' => 1,
+            'social_profile_type' => 1,
+            'profile_url' => 'https://linkedin.com/in/janedoe',
+            'created_at' => '2026-05-22T00:00:00+00:00',
+            'updated_at' => '2026-05-22T00:00:00+00:00',
+        ];
+    }
+}
