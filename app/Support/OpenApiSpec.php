@@ -22,6 +22,7 @@ final class OpenApiSpec
             'tags' => [
                 ['name' => 'Auth', 'description' => 'Authentication and account lifecycle endpoints'],
                 ['name' => 'Profile', 'description' => 'Authenticated profile and portfolio endpoints'],
+                ['name' => 'Company', 'description' => 'Company and company member management endpoints'],
             ],
             'paths' => self::paths(),
             'components' => [
@@ -295,6 +296,121 @@ final class OpenApiSpec
                         'properties' => [
                             'social_profile_type' => ['type' => 'integer', 'enum' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'example' => 1],
                             'profile_url' => ['type' => 'string', 'format' => 'uri', 'example' => 'https://linkedin.com/in/janedoe'],
+                        ],
+                    ],
+                    'Company' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'slug' => ['type' => 'string', 'example' => 'acme-ltd'],
+                            'name' => ['type' => 'string', 'example' => 'Acme Ltd'],
+                            'description' => ['type' => 'string', 'nullable' => true, 'example' => 'A sample company'],
+                            'logo' => ['type' => 'string', 'nullable' => true, 'example' => 'logos/acme.png'],
+                            'website' => ['type' => 'string', 'nullable' => true, 'format' => 'uri', 'example' => 'https://acme.test'],
+                            'industry' => ['type' => 'string', 'nullable' => true, 'example' => 'Technology'],
+                            'company_size' => ['type' => 'string', 'nullable' => true, 'example' => '51-200'],
+                            'founded_year' => ['type' => 'integer', 'nullable' => true, 'example' => 2020],
+                            'location' => ['type' => 'string', 'nullable' => true, 'example' => 'London, UK'],
+                            'email' => ['type' => 'string', 'nullable' => true, 'format' => 'email', 'example' => 'hello@acme.test'],
+                            'phone' => ['type' => 'string', 'nullable' => true, 'example' => '123456789'],
+                            'created_by' => ['type' => 'integer', 'example' => 1],
+                            'is_verified' => ['type' => 'boolean', 'example' => true],
+                            'owner' => ['$ref' => '#/components/schemas/CompanyOwner'],
+                            'people' => [
+                                'type' => 'array',
+                                'items' => ['$ref' => '#/components/schemas/CompanyPerson'],
+                            ],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'updated_at' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'CompanyPerson' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'company_role' => ['type' => 'string', 'example' => 'recruiter'],
+                            'position' => ['type' => 'string', 'example' => 'Developer'],
+                            'information' => ['type' => 'string', 'nullable' => true, 'example' => 'Works on backend features'],
+                            'start_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-01-01'],
+                            'end_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-12-31'],
+                            'is_current_position' => ['type' => 'boolean', 'example' => true],
+                            'user' => ['$ref' => '#/components/schemas/UserSimple'],
+                            'is_company_owner' => ['type' => 'boolean', 'example' => false],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'updated_at' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'CompanyOwner' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'name' => ['type' => 'string', 'example' => 'Jane Doe'],
+                            'email' => ['type' => 'string', 'format' => 'email', 'example' => 'jane@example.com'],
+                            'avatar' => ['type' => 'string', 'nullable' => true, 'example' => 'avatars/jane.jpg'],
+                            'bio' => ['type' => 'string', 'nullable' => true, 'example' => 'Product designer and frontend developer.'],
+                            'email_verified_at' => ['type' => 'string', 'nullable' => true, 'format' => 'date-time'],
+                            'role' => ['$ref' => '#/components/schemas/Role'],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'company_role' => ['type' => 'string', 'example' => 'company_owner'],
+                        ],
+                    ],
+                    'StoreCompanyRequest' => [
+                        'type' => 'object',
+                        'required' => ['name'],
+                        'properties' => [
+                            'name' => ['type' => 'string', 'example' => 'Acme Ltd'],
+                            'slug' => ['type' => 'string', 'nullable' => true, 'example' => 'acme-ltd'],
+                            'description' => ['type' => 'string', 'nullable' => true, 'example' => 'A sample company'],
+                            'logo' => ['type' => 'string', 'nullable' => true, 'example' => 'logos/acme.png'],
+                            'website' => ['type' => 'string', 'nullable' => true, 'format' => 'uri', 'example' => 'https://acme.test'],
+                            'industry' => ['type' => 'string', 'nullable' => true, 'example' => 'Technology'],
+                            'company_size' => ['type' => 'string', 'nullable' => true, 'example' => '51-200'],
+                            'founded_year' => ['type' => 'integer', 'nullable' => true, 'example' => 2020],
+                            'location' => ['type' => 'string', 'nullable' => true, 'example' => 'London, UK'],
+                            'email' => ['type' => 'string', 'nullable' => true, 'format' => 'email', 'example' => 'hello@acme.test'],
+                            'phone' => ['type' => 'string', 'nullable' => true, 'example' => '123456789'],
+                            'is_verified' => ['type' => 'boolean', 'nullable' => true, 'example' => false],
+                        ],
+                    ],
+                    'UpdateCompanyRequest' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => ['type' => 'string', 'example' => 'Acme Ltd'],
+                            'slug' => ['type' => 'string', 'nullable' => true, 'example' => 'acme-ltd'],
+                            'description' => ['type' => 'string', 'nullable' => true, 'example' => 'A sample company'],
+                            'logo' => ['type' => 'string', 'nullable' => true, 'example' => 'logos/acme.png'],
+                            'website' => ['type' => 'string', 'nullable' => true, 'format' => 'uri', 'example' => 'https://acme.test'],
+                            'industry' => ['type' => 'string', 'nullable' => true, 'example' => 'Technology'],
+                            'company_size' => ['type' => 'string', 'nullable' => true, 'example' => '51-200'],
+                            'founded_year' => ['type' => 'integer', 'nullable' => true, 'example' => 2020],
+                            'location' => ['type' => 'string', 'nullable' => true, 'example' => 'London, UK'],
+                            'email' => ['type' => 'string', 'nullable' => true, 'format' => 'email', 'example' => 'hello@acme.test'],
+                            'phone' => ['type' => 'string', 'nullable' => true, 'example' => '123456789'],
+                            'is_verified' => ['type' => 'boolean', 'nullable' => true, 'example' => true],
+                        ],
+                    ],
+                    'StoreCompanyPersonRequest' => [
+                        'type' => 'object',
+                        'required' => ['user_id', 'company_role', 'position'],
+                        'properties' => [
+                            'user_id' => ['type' => 'integer', 'example' => 2],
+                            'company_role' => ['type' => 'string', 'enum' => ['company_owner', 'admin', 'recruiter', 'candidate'], 'example' => 'recruiter'],
+                            'position' => ['type' => 'string', 'example' => 'Developer'],
+                            'information' => ['type' => 'string', 'nullable' => true, 'example' => 'Works on backend features'],
+                            'start_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-01-01'],
+                            'end_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-12-31'],
+                            'is_current_position' => ['type' => 'boolean', 'nullable' => true, 'example' => true],
+                        ],
+                    ],
+                    'UpdateCompanyPersonRequest' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'company_role' => ['type' => 'string', 'enum' => ['company_owner', 'admin', 'recruiter', 'candidate'], 'example' => 'admin'],
+                            'position' => ['type' => 'string', 'example' => 'Operations Lead'],
+                            'information' => ['type' => 'string', 'nullable' => true, 'example' => 'Handles recruiting operations'],
+                            'start_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-02-01'],
+                            'end_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-12-31'],
+                            'is_current_position' => ['type' => 'boolean', 'nullable' => true, 'example' => true],
                         ],
                     ],
                 ],
@@ -765,6 +881,132 @@ final class OpenApiSpec
                     [self::parameter('socialProfile', 'path', 'integer', 'Social profile id')],
                 ),
             ],
+            '/companies' => [
+                'get' => self::operation(
+                    'List companies owned by or assigned to the authenticated user',
+                    'Company',
+                    null,
+                    self::success('Companies retrieved successfully', [
+                        'companies' => [self::companyExample()],
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                ),
+                'post' => self::operation(
+                    'Create a company',
+                    'Company',
+                    self::requestBody('#/components/schemas/StoreCompanyRequest'),
+                    self::success('Company created successfully', [
+                        'company' => self::companyExample(),
+                    ], 201),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                ),
+            ],
+            '/companies/{company}' => [
+                'get' => self::operation(
+                    'Get a specific company',
+                    'Company',
+                    null,
+                    self::success('Company retrieved successfully', [
+                        'company' => self::companyExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to view this company'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('company', 'path', 'integer', 'Company id')],
+                ),
+                'patch' => self::operation(
+                    'Update a company',
+                    'Company',
+                    self::requestBody('#/components/schemas/UpdateCompanyRequest'),
+                    self::success('Company updated successfully', [
+                        'company' => self::companyExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to update this company'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                    [self::parameter('company', 'path', 'integer', 'Company id')],
+                ),
+                'delete' => self::operation(
+                    'Delete a company',
+                    'Company',
+                    null,
+                    self::success('Company deleted successfully', null),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to delete this company'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('company', 'path', 'integer', 'Company id')],
+                ),
+            ],
+            '/companies/{company}/people' => [
+                'post' => self::operation(
+                    'Add a person to a company',
+                    'Company',
+                    self::requestBody('#/components/schemas/StoreCompanyPersonRequest'),
+                    self::success('Person added to company successfully', [
+                        'person' => self::companyPersonExample(),
+                    ], 201),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to manage company people'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                    [self::parameter('company', 'path', 'integer', 'Company id')],
+                ),
+            ],
+            '/companies/{company}/people/{membership}' => [
+                'patch' => self::operation(
+                    'Update a company member membership',
+                    'Company',
+                    self::requestBody('#/components/schemas/UpdateCompanyPersonRequest'),
+                    self::success('Person updated successfully', [
+                        'person' => self::companyPersonExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to manage company people'),
+                        '404' => self::error('Resource not found'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                    [
+                        self::parameter('company', 'path', 'integer', 'Company id'),
+                        self::parameter('membership', 'path', 'integer', 'Company membership id'),
+                    ],
+                ),
+                'delete' => self::operation(
+                    'Remove a company member',
+                    'Company',
+                    null,
+                    self::success('Person removed from company successfully', null),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to manage company people'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [
+                        self::parameter('company', 'path', 'integer', 'Company id'),
+                        self::parameter('membership', 'path', 'integer', 'Company membership id'),
+                    ],
+                ),
+            ],
         ];
     }
 
@@ -984,6 +1226,54 @@ final class OpenApiSpec
             'profile_url' => 'https://linkedin.com/in/janedoe',
             'created_at' => '2026-05-22T00:00:00+00:00',
             'updated_at' => '2026-05-22T00:00:00+00:00',
+        ];
+    }
+
+    private static function companyExample(): array
+    {
+        return [
+            'id' => 1,
+            'slug' => 'acme-ltd',
+            'name' => 'Acme Ltd',
+            'description' => 'A sample company',
+            'logo' => 'logos/acme.png',
+            'website' => 'https://acme.test',
+            'industry' => 'Technology',
+            'company_size' => '51-200',
+            'founded_year' => 2020,
+            'location' => 'London, UK',
+            'email' => 'hello@acme.test',
+            'phone' => '123456789',
+            'created_by' => 1,
+            'is_verified' => true,
+            'owner' => self::companyOwnerExample(),
+            'people' => [self::companyPersonExample()],
+            'created_at' => '2026-05-22T00:00:00+00:00',
+            'updated_at' => '2026-05-22T00:00:00+00:00',
+        ];
+    }
+
+    private static function companyPersonExample(): array
+    {
+        return [
+            'id' => 1,
+            'company_role' => 'recruiter',
+            'position' => 'Developer',
+            'information' => 'Works on backend features',
+            'start_date' => '2026-01-01',
+            'end_date' => null,
+            'is_current_position' => true,
+            'user' => self::userSimpleExample(),
+            'is_company_owner' => false,
+            'created_at' => '2026-05-22T00:00:00+00:00',
+            'updated_at' => '2026-05-22T00:00:00+00:00',
+        ];
+    }
+
+    private static function companyOwnerExample(): array
+    {
+        return self::userSimpleExample() + [
+            'company_role' => 'company_owner',
         ];
     }
 }
