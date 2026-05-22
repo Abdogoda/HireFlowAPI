@@ -883,7 +883,7 @@ final class OpenApiSpec
             ],
             '/companies' => [
                 'get' => self::operation(
-                    'List companies owned by or assigned to the authenticated user',
+                    'List all companies with search and filters',
                     'Company',
                     null,
                     self::success('Companies retrieved successfully', [
@@ -893,6 +893,16 @@ final class OpenApiSpec
                         '401' => self::error('Unauthenticated'),
                     ],
                     true,
+                    [
+                        self::parameter('search', 'query', 'string', 'Search across name, slug, description, industry, and location', false),
+                        self::parameter('industry', 'query', 'string', 'Filter by exact industry', false),
+                        self::parameter('location', 'query', 'string', 'Filter by partial location', false),
+                        self::parameter('company_size', 'query', 'string', 'Filter by exact company size', false),
+                        self::parameter('is_verified', 'query', 'boolean', 'Filter by verification status', false),
+                        self::parameter('founded_year', 'query', 'integer', 'Filter by founded year', false),
+                        self::parameter('sort_by', 'query', 'string', 'Sort field: name, created_at, founded_year', false),
+                        self::parameter('sort_direction', 'query', 'string', 'Sort direction: asc or desc', false),
+                    ],
                 ),
                 'post' => self::operation(
                     'Create a company',
@@ -908,6 +918,30 @@ final class OpenApiSpec
                     true,
                 ),
             ],
+            '/companies/my' => [
+                'get' => self::operation(
+                    'List companies for the authenticated user',
+                    'Company',
+                    null,
+                    self::success('User companies retrieved successfully', [
+                        'companies' => [self::companyExample()],
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                    [
+                        self::parameter('search', 'query', 'string', 'Search across name, slug, description, industry, and location', false),
+                        self::parameter('industry', 'query', 'string', 'Filter by exact industry', false),
+                        self::parameter('location', 'query', 'string', 'Filter by partial location', false),
+                        self::parameter('company_size', 'query', 'string', 'Filter by exact company size', false),
+                        self::parameter('is_verified', 'query', 'boolean', 'Filter by verification status', false),
+                        self::parameter('founded_year', 'query', 'integer', 'Filter by founded year', false),
+                        self::parameter('sort_by', 'query', 'string', 'Sort field: name, created_at, founded_year', false),
+                        self::parameter('sort_direction', 'query', 'string', 'Sort direction: asc or desc', false),
+                    ],
+                ),
+            ],
             '/companies/{company}' => [
                 'get' => self::operation(
                     'Get a specific company',
@@ -918,7 +952,6 @@ final class OpenApiSpec
                     ]),
                     [
                         '401' => self::error('Unauthenticated'),
-                        '403' => self::error('You do not have permission to view this company'),
                         '404' => self::error('Resource not found'),
                     ],
                     true,

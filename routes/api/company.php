@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/', [CompanyController::class, 'index'])->name('companies.index');
+    Route::get('/my', [CompanyController::class, 'myCompanies'])->name('companies.my');
     Route::post('/', [CompanyController::class, 'store'])->name('companies.store');
     Route::get('{company}', [CompanyController::class, 'show'])->name('companies.show');
     Route::patch('{company}', [CompanyController::class, 'update'])->name('companies.update');

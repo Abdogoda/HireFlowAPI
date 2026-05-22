@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Company\IndexCompanyRequest;
 use App\Http\Requests\Company\StoreCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
 use App\Http\Resources\CompanyResource;
@@ -13,27 +14,23 @@ use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(IndexCompanyRequest $request, CompanyService $companyService): JsonResponse
     {
-        $ownedCompanies = $request->user()
-            ->ownedCompanies()
-            ->with(['owner', 'memberships.user'])
-            ->get();
-
-        $memberCompanies = Company::query()
-            ->whereHas('memberships', fn ($query) => $query->where('user_id', $request->user()->id))
-            ->with(['owner', 'memberships.user'])
-            ->get();
-
-        $companies = $ownedCompanies
-            ->merge($memberCompanies)
-            ->unique('id')
-            ->sortByDesc('created_at')
-            ->values();
+        $companies = $companyService->getCompanies($request->validated());
 
         return $this->successResponse(
             ['companies' => CompanyResource::collection($companies)],
             'Companies retrieved successfully'
+        );
+    }
+
+    public function myCompanies(IndexCompanyRequest $request, CompanyService $companyService): JsonResponse
+    {
+        $companies = $companyService->getUserCompanies($request->user(), $request->validated());
+
+        return $this->successResponse(
+            ['companies' => CompanyResource::collection($companies)],
+            'User companies retrieved successfully'
         );
     }
 
@@ -55,8 +52,6 @@ class CompanyController extends Controller
 
     public function show(Request $request, Company $company): JsonResponse
     {
-        $this->authorize('view', $company);
-
         return $this->successResponse(
             ['company' => new CompanyResource($company->load(['owner', 'memberships.user']))],
             'Company retrieved successfully'

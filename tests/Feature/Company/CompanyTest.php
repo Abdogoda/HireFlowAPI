@@ -91,40 +91,52 @@ describe('Company Endpoints', function () {
     });
 
     describe('Company Listing', function () {
-        it('lists companies owned by and assigned to the user', function () {
-            $owner = $this->createUser(['email' => 'owner@example.com']);
-            $member = $this->createUser(['email' => 'member@example.com']);
+        it('lists all companies for any authenticated user', function () {
+            $viewer = $this->createUser(['email' => 'viewer@example.com']);
 
-            $ownedCompany = $owner->ownedCompanies()->create([
-                'name' => 'Owned Company',
-                'slug' => 'owned-company',
-            ]);
+            $this->createUser(['email' => 'owner-one@example.com'])
+                ->ownedCompanies()
+                ->create([
+                    'name' => 'Owned Company',
+                    'slug' => 'owned-company',
+                ]);
 
-            $sharedCompany = $this->createUser(['email' => 'other-owner@example.com'])
+            $this->createUser(['email' => 'owner-two@example.com'])
                 ->ownedCompanies()
                 ->create([
                     'name' => 'Shared Company',
                     'slug' => 'shared-company',
                 ]);
 
-            $ownedCompany->memberships()->create([
-                'user_id' => $owner->id,
-                'company_role' => CompanyRoles::OWNER->value,
-                'position' => 'Company Owner',
-                'start_date' => now()->toDateString(),
-                'is_current_position' => true,
-            ]);
-
-            $sharedCompany->memberships()->create([
-                'user_id' => $member->id,
-                'company_role' => CompanyRoles::RECRUITER->value,
-                'position' => 'Recruiter',
-                'start_date' => now()->toDateString(),
-                'is_current_position' => true,
-            ]);
-
-            $response = $this->actingAs($member)
+            $response = $this->actingAs($viewer)
                 ->getJson('/api/companies');
+
+            $response->assertStatus(200)
+                ->assertJsonCount(2, 'data.companies');
+        });
+
+        it('supports search and filter query parameters', function () {
+            $viewer = $this->createUser(['email' => 'viewer@example.com']);
+            $owner = $this->createUser(['email' => 'owner@example.com']);
+
+            $owner->ownedCompanies()->create([
+                'name' => 'Alpha Tech',
+                'slug' => 'alpha-tech',
+                'industry' => 'Technology',
+                'location' => 'Cairo',
+                'is_verified' => true,
+            ]);
+
+            $owner->ownedCompanies()->create([
+                'name' => 'Beta Foods',
+                'slug' => 'beta-foods',
+                'industry' => 'Food',
+                'location' => 'Alexandria',
+                'is_verified' => false,
+            ]);
+
+            $response = $this->actingAs($viewer)
+                ->getJson('/api/companies?search=Alpha&industry=Technology&is_verified=1');
 
             $response->assertStatus(200)
                 ->assertJsonCount(1, 'data.companies')
@@ -132,7 +144,9 @@ describe('Company Endpoints', function () {
                     'data' => [
                         'companies' => [
                             [
-                                'name' => 'Shared Company',
+                                'name' => 'Alpha Tech',
+                                'industry' => 'Technology',
+                                'is_verified' => true,
                             ],
                         ],
                     ],
@@ -140,11 +154,71 @@ describe('Company Endpoints', function () {
         });
     });
 
+    describe('Company Show and My Companies', function () {
+        it('allows any authenticated user to view company details', function () {
+            $viewer = $this->createUser(['email' => 'viewer@example.com']);
+            $owner = $this->createUser(['email' => 'owner@example.com']);
+
+            $company = $owner->ownedCompanies()->create([
+                'name' => 'Acme Ltd',
+                'slug' => 'acme-ltd',
+            ]);
+
+            $response = $this->actingAs($viewer)
+                ->getJson("/api/companies/{$company->id}");
+
+            $response->assertStatus(200)
+                ->assertJsonPath('data.company.id', $company->id)
+                ->assertJsonPath('data.company.name', 'Acme Ltd');
+        });
+
+        it('lists only user companies in dedicated endpoint', function () {
+            $user = $this->createUser(['email' => 'member@example.com']);
+            $owner = $this->createUser(['email' => 'owner@example.com']);
+
+            $ownedCompany = $user->ownedCompanies()->create([
+                'name' => 'Owned Co',
+                'slug' => 'owned-co',
+            ]);
+
+            $memberCompany = $owner->ownedCompanies()->create([
+                'name' => 'Member Co',
+                'slug' => 'member-co',
+            ]);
+
+            $otherCompany = $owner->ownedCompanies()->create([
+                'name' => 'Other Co',
+                'slug' => 'other-co',
+            ]);
+
+            $memberCompany->memberships()->create([
+                'user_id' => $user->id,
+                'company_role' => CompanyRoles::RECRUITER->value,
+                'position' => 'Recruiter',
+                'start_date' => now()->toDateString(),
+                'is_current_position' => true,
+            ]);
+
+            $response = $this->actingAs($user)
+                ->getJson('/api/companies/my');
+
+            $response->assertStatus(200)
+                ->assertJsonCount(2, 'data.companies');
+
+            $companyIds = collect($response->json('data.companies'))->pluck('id');
+
+            expect($companyIds)->toContain($ownedCompany->id);
+            expect($companyIds)->toContain($memberCompany->id);
+            expect($companyIds)->not->toContain($otherCompany->id);
+        });
+    });
+
     describe('Company Policy', function () {
-        it('allows owners and current members to view companies', function () {
+        it('allows any authenticated user to view companies', function () {
             $policy = new CompanyPolicy();
             $owner = $this->createUser(['email' => 'owner@example.com']);
             $member = $this->createUser(['email' => 'member@example.com']);
+            $viewer = $this->createUser(['email' => 'viewer@example.com']);
 
             $company = $owner->ownedCompanies()->create([
                 'name' => 'Acme Ltd',
@@ -169,6 +243,7 @@ describe('Company Endpoints', function () {
 
             expect($policy->view($owner, $company))->toBeTrue();
             expect($policy->view($member, $company))->toBeTrue();
+            expect($policy->view($viewer, $company))->toBeTrue();
         });
 
         it('allows only owners and admins to manage companies', function () {

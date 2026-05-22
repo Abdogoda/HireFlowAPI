@@ -10,11 +10,7 @@ class CompanyPolicy
 {
     public function view(User $user, Company $company): bool
     {
-        return $company->created_by === $user->id
-            || $company->memberships()
-                ->where('user_id', $user->id)
-                ->where('is_current_position', true)
-                ->exists();
+        return true;
     }
 
     public function create(User $user): bool
