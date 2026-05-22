@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Company;
+use App\Models\CompanyMembership;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -37,6 +39,16 @@ class User extends Authenticatable implements MustVerifyEmailContract
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function ownedCompanies(): HasMany
+    {
+        return $this->hasMany(Company::class, 'created_by');
+    }
+
+    public function companyMemberships(): HasMany
+    {
+        return $this->hasMany(CompanyMembership::class);
     }
 
     public function skills(): HasMany

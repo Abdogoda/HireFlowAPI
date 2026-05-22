@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Http\Resources;
+
+use App\Enums\Authorization\CompanyRoles;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class CompanyPersonResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'company_role' => $this->company_role,
+            'position' => $this->position,
+            'information' => $this->information,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+            'is_current_position' => $this->is_current_position,
+            'user' => new UserSimpleResource($this->whenLoaded('user')),
+            'is_company_owner' => $this->company_role === CompanyRoles::OWNER->value,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
+    }
+}
