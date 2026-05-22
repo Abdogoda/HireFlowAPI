@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Profile;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
+use App\Enums\Users\SocialProfileType;
 
 class UpdateSocialProfileRequest extends FormRequest
 {
@@ -14,7 +16,7 @@ class UpdateSocialProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'social_profile_type' => 'sometimes|integer|in:1,2,3,4,5,6,7,8,9,10',
+            'social_profile_type' => ['sometimes', new Enum(SocialProfileType::class)],
             'profile_url' => 'sometimes|url',
         ];
     }

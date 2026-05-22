@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Profile;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
+use App\Enums\Profile\PictureType;
 
 class StorePictureRequest extends FormRequest
 {
@@ -15,7 +17,7 @@ class StorePictureRequest extends FormRequest
     {
         return [
             'picture' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB
-            'type' => 'required|in:profile,thumbnail',
+            'type' => ['required', new Enum(PictureType::class)],
         ];
     }
 

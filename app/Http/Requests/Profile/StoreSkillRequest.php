@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Profile;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
+use App\Enums\Profile\ProficiencyLevel;
 
 class StoreSkillRequest extends FormRequest
 {
@@ -15,7 +17,7 @@ class StoreSkillRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'proficiency_level' => 'sometimes|in:beginner,intermediate,advanced,expert',
+            'proficiency_level' => ['sometimes', new Enum(ProficiencyLevel::class)],
             'years_of_experience' => 'sometimes|numeric|nullable|min:0',
             'endorsement_count' => 'sometimes|integer|nullable|min:0',
         ];

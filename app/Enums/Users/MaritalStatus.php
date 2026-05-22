@@ -4,13 +4,13 @@ namespace App\Enums\Users;
 
 use App\Traits\BaseEnum;
 
-enum MaritalStatus: int
+enum MaritalStatus: string
 {
     use BaseEnum;
 
-    case SINGLE   = 1;
-    case ENGAGED  = 2;
-    case MARRIED  = 3;
-    case DIVORCED = 4;
-    case WIDOWED  = 5;
+    case SINGLE   = 'single';
+    case ENGAGED  = 'engaged';
+    case MARRIED  = 'married';
+    case DIVORCED = 'divorced';
+    case WIDOWED  = 'widowed';
 }

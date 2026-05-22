@@ -4,11 +4,11 @@ namespace App\Enums\Users;
 
 use App\Traits\BaseEnum;
 
-enum Gender: int
+enum Gender: string
 {
     use BaseEnum;
 
-    case OTHER  = 0;
-    case MALE   = 1;
-    case FEMALE = 2;
+    case OTHER  = 'other';
+    case MALE   = 'male';
+    case FEMALE = 'female';
 }

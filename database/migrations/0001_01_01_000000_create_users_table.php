@@ -27,9 +27,9 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->string('state')->nullable();
             $table->string('country')->nullable();
-            $table->tinyInteger('gender')->nullable();
-            $table->tinyInteger('marital_status')->nullable();
-            $table->tinyInteger('religion')->nullable();
+            $table->string('gender')->nullable();
+            $table->string('marital_status')->nullable();
+            $table->string('religion')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -4,12 +4,12 @@ namespace App\Enums\Users;
 
 use App\Traits\BaseEnum;
 
-enum Religion: int
+enum Religion: string
 {
     use BaseEnum;
 
-    case OTHER     = 0;
-    case MUSLIM    = 1;
-    case CHRISTIAN = 2;
-    case JEWISH    = 3;
+    case OTHER     = 'other';
+    case MUSLIM    = 'muslim';
+    case CHRISTIAN = 'christian';
+    case JEWISH    = 'jewish';
 }
