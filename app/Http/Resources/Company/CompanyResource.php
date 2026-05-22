@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Company;
 
 use App\Enums\Authorization\CompanyRoles;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\User\UserSimpleResource;
 
 class CompanyResource extends JsonResource
 {

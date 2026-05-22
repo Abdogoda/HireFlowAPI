@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\StoreSocialProfileRequest;
 use App\Http\Requests\Profile\UpdateSocialProfileRequest;
-use App\Http\Resources\SocialProfileResource;
+use App\Http\Resources\Profile\SocialProfileResource;
 use App\Models\SocialProfile;
 use App\Services\SocialProfileService;
 use Illuminate\Http\JsonResponse;

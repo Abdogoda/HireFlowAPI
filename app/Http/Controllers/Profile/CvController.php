@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\StoreCvRequest;
-use App\Http\Resources\ResumeResource;
+use App\Http\Resources\Profile\ResumeResource;
 use App\Models\Resume;
 use App\Services\CvService;
 use Illuminate\Http\JsonResponse;

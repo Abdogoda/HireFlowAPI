@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\StoreSkillRequest;
 use App\Http\Requests\Profile\UpdateSkillRequest;
-use App\Http\Resources\SkillResource;
+use App\Http\Resources\Profile\SkillResource;
 use App\Models\Skill;
 use App\Services\SkillService;
 use Illuminate\Http\JsonResponse;

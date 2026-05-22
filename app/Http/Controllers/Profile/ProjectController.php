@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\StoreProjectRequest;
 use App\Http\Requests\Profile\UpdateProjectRequest;
-use App\Http\Resources\ProjectResource;
+use App\Http\Resources\Profile\ProjectResource;
 use App\Models\Project;
 use App\Services\ProjectService;
 use Illuminate\Http\JsonResponse;

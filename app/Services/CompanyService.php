@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Enums\Authorization\CompanyRoles;
-use App\Http\Resources\CompanyPersonResource;
-use App\Http\Resources\CompanyResource;
+use App\Http\Resources\Company\CompanyPersonResource;
+use App\Http\Resources\Company\CompanyResource;
 use App\Models\Company;
 use App\Models\CompanyMembership;
 use App\Models\User;

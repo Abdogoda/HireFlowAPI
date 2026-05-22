@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\SocialProfile;
-use App\Http\Resources\SocialProfileResource;
+use App\Http\Resources\Profile\SocialProfileResource;
 use Illuminate\Http\JsonResponse;
 
 class SocialProfileService

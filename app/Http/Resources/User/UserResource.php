@@ -1,9 +1,15 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Role\RoleResource;
+use App\Http\Resources\Profile\SkillResource;
+use App\Http\Resources\Profile\ExperienceResource;
+use App\Http\Resources\Profile\ProjectResource;
+use App\Http\Resources\Profile\ResumeResource;
+use App\Http\Resources\Profile\SocialProfileResource;
 
 class UserResource extends JsonResource
 {

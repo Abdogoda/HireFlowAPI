@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Profile;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RoleResource extends JsonResource
+class ResumeResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,8 +16,11 @@ class RoleResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'description' => $this->description,
+            'title' => $this->title,
+            'file_name' => $this->file_name,
+            'file_path' => $this->file_path,
+            'file_url' => $this->file_url,
+            'is_primary' => $this->is_primary,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

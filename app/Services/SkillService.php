@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Skill;
-use App\Http\Resources\SkillResource;
+use App\Http\Resources\Profile\SkillResource;
 use Illuminate\Http\JsonResponse;
 
 class SkillService

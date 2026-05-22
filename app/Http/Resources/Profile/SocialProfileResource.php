@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Profile;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ExperienceResource extends JsonResource
+class SocialProfileResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,12 +16,8 @@ class ExperienceResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'company_name' => $this->company_name,
-            'job_title' => $this->job_title,
-            'description' => $this->description,
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
-            'is_current_position' => $this->is_current_position,
+            'social_profile_type' => $this->social_profile_type,
+            'profile_url' => $this->profile_url,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

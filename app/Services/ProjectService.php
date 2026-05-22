@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Project;
-use App\Http\Resources\ProjectResource;
+use App\Http\Resources\Profile\ProjectResource;
 use Illuminate\Http\JsonResponse;
 
 class ProjectService
