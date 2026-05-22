@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Company\CompanyController;
+use App\Http\Controllers\Company\CompanyMemberController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -10,7 +11,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('{company}', [CompanyController::class, 'update'])->name('companies.update');
     Route::delete('{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
 
-    Route::post('{company}/people', [CompanyController::class, 'storePerson'])->name('companies.people.store');
-    Route::patch('{company}/people/{membership}', [CompanyController::class, 'updatePerson'])->name('companies.people.update');
-    Route::delete('{company}/people/{membership}', [CompanyController::class, 'destroyPerson'])->name('companies.people.destroy');
+    Route::post('{company}/people', [CompanyMemberController::class, 'store'])->name('companies.people.store');
+    Route::patch('{company}/people/{membership}', [CompanyMemberController::class, 'update'])->name('companies.people.update');
+    Route::delete('{company}/people/{membership}', [CompanyMemberController::class, 'destroy'])->name('companies.people.destroy');
 });
