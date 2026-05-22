@@ -1,6 +1,9 @@
 <?php
 
 use App\Enums\Authorization\CompanyRoles;
+use App\Notifications\CompanyMemberAddedNotification;
+use App\Notifications\CompanyMemberRemovedNotification;
+use Illuminate\Support\Facades\Notification;
 
 describe('Company Member Endpoints', function () {
     beforeEach(function () {
@@ -8,6 +11,8 @@ describe('Company Member Endpoints', function () {
     });
 
     it('adds a person with position, role, and information to a company', function () {
+        Notification::fake();
+
         $owner = $this->createUser(['email' => 'owner@example.com']);
         $person = $this->createUser(['email' => 'person@example.com']);
 
@@ -53,6 +58,8 @@ describe('Company Member Endpoints', function () {
             'position' => 'Developer',
             'is_current_position' => 1,
         ]);
+
+        Notification::assertSentTo($person, CompanyMemberAddedNotification::class);
     });
 
     it('updates a company member membership record', function () {
@@ -104,6 +111,8 @@ describe('Company Member Endpoints', function () {
     });
 
     it('removes a company member by archiving the membership', function () {
+        Notification::fake();
+
         $owner = $this->createUser(['email' => 'owner@example.com']);
         $person = $this->createUser(['email' => 'person@example.com']);
 
@@ -140,6 +149,8 @@ describe('Company Member Endpoints', function () {
             'id' => $membership->id,
             'is_current_position' => 0,
         ]);
+
+        Notification::assertSentTo($person, CompanyMemberRemovedNotification::class);
     });
 
     it('prevents a company member without admin role from managing company people', function () {

@@ -8,6 +8,8 @@ use App\Http\Resources\CompanyResource;
 use App\Models\Company;
 use App\Models\CompanyMembership;
 use App\Models\User;
+use App\Notifications\CompanyMemberAddedNotification;
+use App\Notifications\CompanyMemberRemovedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -32,6 +34,12 @@ class CompanyService
                 'end_date' => $data['end_date'] ?? null,
                 'is_current_position' => true,
             ]);
+
+            $user->notify(new CompanyMemberAddedNotification(
+                $company->load('owner'),
+                $company->memberships()->latest('id')->firstOrFail(),
+                $user
+            ));
 
             return new CompanyResource($company->load(['owner', 'memberships.user']));
         } catch (\Exception $exception) {
@@ -95,6 +103,12 @@ class CompanyService
                 'is_current_position' => $data['is_current_position'] ?? true,
             ])->load('user');
 
+            $membership->user?->notify(new CompanyMemberAddedNotification(
+                $company->load('owner'),
+                $membership,
+                auth()->user()
+            ));
+
             return new CompanyPersonResource($membership);
         } catch (\Exception $exception) {
             return ResponseService::error(
@@ -154,6 +168,12 @@ class CompanyService
                 'is_current_position' => false,
                 'end_date' => $membership->end_date ?? Carbon::today()->toDateString(),
             ]);
+
+            $membership->user?->notify(new CompanyMemberRemovedNotification(
+                $company->load('owner'),
+                $membership,
+                auth()->user()
+            ));
 
             return true;
         } catch (\Exception $exception) {

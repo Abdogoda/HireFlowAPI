@@ -2,6 +2,8 @@
 
 use App\Enums\Authorization\CompanyRoles;
 use App\Policies\CompanyPolicy;
+use App\Notifications\CompanyMemberAddedNotification;
+use Illuminate\Support\Facades\Notification;
 
 describe('Company Endpoints', function () {
     beforeEach(function () {
@@ -10,6 +12,8 @@ describe('Company Endpoints', function () {
 
     describe('Create Company', function () {
         it('creates a company for the authenticated user', function () {
+            Notification::fake();
+
             $user = $this->createUser();
 
             $response = $this->actingAs($user)
@@ -73,6 +77,8 @@ describe('Company Endpoints', function () {
                 'position' => 'Company Owner',
                 'user_id' => $user->id,
             ]);
+
+            Notification::assertSentTo($user, CompanyMemberAddedNotification::class);
         });
 
         it('fails without authentication', function () {
