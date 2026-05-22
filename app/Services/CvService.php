@@ -65,4 +65,23 @@ class CvService
             );
         }
     }
+
+    /**
+     * Get all CVs for a user
+     *
+     * @param User $user
+     * @return \Illuminate\Database\Eloquent\Collection|JsonResponse
+     */
+    public function getUserCvs(User $user): \Illuminate\Database\Eloquent\Collection|JsonResponse
+    {
+        try {
+            return $user->resumes()->get();
+        } catch (\Exception $e) {
+            return ResponseService::error(
+                'Failed to retrieve CVs',
+                ['error' => $e->getMessage()],
+                500
+            );
+        }
+    }
 }

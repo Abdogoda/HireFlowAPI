@@ -145,4 +145,30 @@ class ProfileService
             );
         }
     }
+
+    /**
+     * Get user profile with related data
+     *
+     * @param User $user
+     * @return UserResource|JsonResponse
+     */
+    public function getProfile(User $user): UserResource|JsonResponse
+    {
+        try {
+            return new UserResource($user->load([
+                'role',
+                'skills',
+                'experiences',
+                'projects',
+                'resumes',
+                'socialProfiles'
+            ]));
+        } catch (\Exception $e) {
+            return ResponseService::error(
+                'Failed to retrieve profile',
+                ['error' => $e->getMessage()],
+                500
+            );
+        }
+    }
 }

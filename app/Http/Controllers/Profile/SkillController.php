@@ -19,9 +19,9 @@ class SkillController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, SkillService $skillService): JsonResponse
     {
-        $skills = $request->user()->skills()->get();
+        $skills = $skillService->getUserSkills($request->user());
 
         return $this->successResponse(
             ['skills' => SkillResource::collection($skills)],

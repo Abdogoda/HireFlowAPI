@@ -70,4 +70,23 @@ class SkillService
             );
         }
     }
+
+    /**
+     * Get all skills for a user
+     *
+     * @param User $user
+     * @return \Illuminate\Database\Eloquent\Collection|JsonResponse
+     */
+    public function getUserSkills(User $user): \Illuminate\Database\Eloquent\Collection|JsonResponse
+    {
+        try {
+            return $user->skills()->get();
+        } catch (\Exception $e) {
+            return ResponseService::error(
+                'Failed to retrieve skills',
+                ['error' => $e->getMessage()],
+                500
+            );
+        }
+    }
 }

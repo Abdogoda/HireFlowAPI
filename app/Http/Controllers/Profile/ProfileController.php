@@ -18,19 +18,16 @@ class ProfileController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function show(Request $request): JsonResponse
+    public function show(Request $request, ProfileService $profileService): JsonResponse
     {
-        $profile = $request->user()->load([
-            'role',
-            'skills',
-            'experiences',
-            'projects',
-            'resumes',
-            'socialProfiles'
-        ]);
+        $result = $profileService->getProfile($request->user());
+
+        if ($result instanceof JsonResponse) {
+            return $result;
+        }
 
         return $this->successResponse(
-            ['profile' => new UserResource($profile)],
+            ['profile' => $result],
             'Profile retrieved successfully'
         );
     }

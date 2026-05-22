@@ -18,9 +18,9 @@ class CvController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, CvService $cvService): JsonResponse
     {
-        $cvs = $request->user()->resumes()->get();
+        $cvs = $cvService->getUserCvs($request->user());
 
         return $this->successResponse(
             ['cvs' => ResumeResource::collection($cvs)],
