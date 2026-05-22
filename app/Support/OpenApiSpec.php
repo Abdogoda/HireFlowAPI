@@ -1144,12 +1144,12 @@ final class OpenApiSpec
         ];
     }
 
-    private static function parameter(string $name, string $in, string $type, string $description): array
+    private static function parameter(string $name, string $in, string $type, string $description, bool $required = true): array
     {
         return [
             'name' => $name,
             'in' => $in,
-            'required' => true,
+            'required' => $required,
             'description' => $description,
             'schema' => [
                 'type' => $type,

@@ -2919,7 +2919,7 @@
                     {
                         "name": "search",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Search across name, slug, description, industry, and location",
                         "schema": {
                             "type": "string"
@@ -2928,7 +2928,7 @@
                     {
                         "name": "industry",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Filter by exact industry",
                         "schema": {
                             "type": "string"
@@ -2937,7 +2937,7 @@
                     {
                         "name": "location",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Filter by partial location",
                         "schema": {
                             "type": "string"
@@ -2946,7 +2946,7 @@
                     {
                         "name": "company_size",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Filter by exact company size",
                         "schema": {
                             "type": "string"
@@ -2955,7 +2955,7 @@
                     {
                         "name": "is_verified",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Filter by verification status",
                         "schema": {
                             "type": "boolean"
@@ -2964,7 +2964,7 @@
                     {
                         "name": "founded_year",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Filter by founded year",
                         "schema": {
                             "type": "integer"
@@ -2973,7 +2973,7 @@
                     {
                         "name": "sort_by",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Sort field: name, created_at, founded_year",
                         "schema": {
                             "type": "string"
@@ -2982,7 +2982,7 @@
                     {
                         "name": "sort_direction",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Sort direction: asc or desc",
                         "schema": {
                             "type": "string"
@@ -3250,7 +3250,7 @@
                     {
                         "name": "search",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Search across name, slug, description, industry, and location",
                         "schema": {
                             "type": "string"
@@ -3259,7 +3259,7 @@
                     {
                         "name": "industry",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Filter by exact industry",
                         "schema": {
                             "type": "string"
@@ -3268,7 +3268,7 @@
                     {
                         "name": "location",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Filter by partial location",
                         "schema": {
                             "type": "string"
@@ -3277,7 +3277,7 @@
                     {
                         "name": "company_size",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Filter by exact company size",
                         "schema": {
                             "type": "string"
@@ -3286,7 +3286,7 @@
                     {
                         "name": "is_verified",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Filter by verification status",
                         "schema": {
                             "type": "boolean"
@@ -3295,7 +3295,7 @@
                     {
                         "name": "founded_year",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Filter by founded year",
                         "schema": {
                             "type": "integer"
@@ -3304,7 +3304,7 @@
                     {
                         "name": "sort_by",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Sort field: name, created_at, founded_year",
                         "schema": {
                             "type": "string"
@@ -3313,7 +3313,7 @@
                     {
                         "name": "sort_direction",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "description": "Sort direction: asc or desc",
                         "schema": {
                             "type": "string"
