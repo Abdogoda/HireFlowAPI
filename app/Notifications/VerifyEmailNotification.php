@@ -3,10 +3,9 @@
 namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailBase;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class VerifyEmailNotification extends VerifyEmailBase implements ShouldQueue
+class VerifyEmailNotification extends VerifyEmailBase
 {
     public function toMail($notifiable): MailMessage
     {
