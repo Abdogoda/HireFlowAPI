@@ -27,6 +27,12 @@ class AuthService
                 'role_id' => $data['role_id'],
             ]);
 
+            $verificationResult = $this->sendEmailVerification($user);
+
+            if ($verificationResult instanceof JsonResponse) {
+                return $verificationResult;
+            }
+
             return new UserSimpleResource($user->load('role'));
         } catch (\Exception $e) {
             return ResponseService::error(
@@ -51,7 +57,9 @@ class AuthService
 
         $user = Auth::user();
 
-        if (!$user->email_verified_at) {
+        if (!$user->hasVerifiedEmail()) {
+            $this->sendEmailVerification($user);
+
             return ResponseService::forbidden('Please verify your email before logging in');
         }
 

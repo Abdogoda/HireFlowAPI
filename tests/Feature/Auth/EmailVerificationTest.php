@@ -1,5 +1,8 @@
 <?php
 
+use App\Notifications\VerifyEmailNotification;
+use Illuminate\Support\Facades\Notification;
+
 describe('Email Verification Endpoint', function () {
     beforeEach(function () {
         $this->createDefaultRoles();
@@ -81,7 +84,9 @@ describe('Email Verification Endpoint', function () {
     });
 
     it('unverified user cannot login', function () {
-        $this->createUserWithRole('Candidate', [
+        Notification::fake();
+
+        $user = $this->createUserWithRole('Candidate', [
             'name' => 'Unverified User',
             'email' => 'unverified@example.com',
             'email_verified_at' => null,
@@ -94,6 +99,8 @@ describe('Email Verification Endpoint', function () {
 
         $response->assertStatus(403)
             ->assertJson(['message' => 'Please verify your email before logging in']);
+
+    Notification::assertSentTo($user, VerifyEmailNotification::class);
     });
 
     it('cannot resend verification if already verified', function () {

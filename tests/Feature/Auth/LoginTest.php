@@ -1,11 +1,16 @@
 <?php
 
+use App\Notifications\VerifyEmailNotification;
+use Illuminate\Support\Facades\Notification;
+
 describe('Login Endpoint', function () {
     beforeEach(function () {
         $this->createDefaultRoles();
     });
 
     it('logs in a user with verified email', function () {
+        Notification::fake();
+
         $user = $this->createUserWithRole('Candidate', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
@@ -38,10 +43,13 @@ describe('Login Endpoint', function () {
             ]);
 
         $this->assertNotEmpty($response->json('data.token'));
+            Notification::assertNotSentTo($user, VerifyEmailNotification::class);
     });
 
     it('fails with unverified email', function () {
-        $this->createUserWithRole('Candidate', [
+            Notification::fake();
+
+            $user = $this->createUserWithRole('Candidate', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'email_verified_at' => null,
@@ -54,6 +62,8 @@ describe('Login Endpoint', function () {
 
         $response->assertStatus(403)
             ->assertJson(['message' => 'Please verify your email before logging in']);
+
+        Notification::assertSentTo($user, VerifyEmailNotification::class);
     });
 
     it('fails with invalid credentials', function () {

@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\User;
+use App\Notifications\VerifyEmailNotification;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Hash;
 
 describe('Register Endpoint', function () {
@@ -9,6 +11,8 @@ describe('Register Endpoint', function () {
     });
 
     it('registers a new user with valid data', function () {
+        Notification::fake();
+
         $candidateRole = $this->getRole('Candidate');
 
         $response = $this->postJson('/api/auth/register', [
@@ -36,7 +40,11 @@ describe('Register Endpoint', function () {
                 ],
             ]);
 
-        $this->assertDatabaseHas('users', ['name' => 'John Doe', 'email' => 'john@example.com']);
+            $user = User::where('email', 'john@example.com')->first();
+
+            $this->assertNotNull($user);
+            $this->assertNull($user->email_verified_at);
+            Notification::assertSentTo($user, VerifyEmailNotification::class);
     });
 
     it('fails with invalid email', function () {
