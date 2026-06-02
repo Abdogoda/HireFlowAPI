@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums\Company;
+namespace App\Enums;
 
 use App\Traits\BaseEnum;
 

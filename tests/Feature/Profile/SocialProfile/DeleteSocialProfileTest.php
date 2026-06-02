@@ -1,8 +1,6 @@
 <?php
 
-use App\Models\User;
-use App\Models\Role;
-use App\Enums\Users\SocialProfileType;
+use App\Enums\SocialProfileType;
 
 beforeEach(function () {
         $this->createDefaultRoles();

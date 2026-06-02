@@ -1,15 +1,13 @@
 <?php
 
-use App\Models\User;
-use App\Models\Role;
-use App\Enums\Users\SocialProfileType;
+use App\Enums\SocialProfileType;
 
 beforeEach(function () {
-        $this->createDefaultRoles();
-    });
+    $this->createDefaultRoles();
+});
 
 describe('Update Social Profile', function () {
-        it('updates a social profile successfully', function () {
+    it("updates a social profile successfully", function () {
             $user = $this->createUser();
             $socialProfile = $user->socialProfiles()->create([
                 'social_profile_type' => SocialProfileType::LINKEDIN->value,

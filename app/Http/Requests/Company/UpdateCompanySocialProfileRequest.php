@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Company;
 
-use App\Enums\Company\SocialProfileType;
+use App\Enums\SocialProfileType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 

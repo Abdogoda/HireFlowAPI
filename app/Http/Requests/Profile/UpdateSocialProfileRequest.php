@@ -4,7 +4,7 @@ namespace App\Http\Requests\Profile;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
-use App\Enums\Users\SocialProfileType;
+use App\Enums\SocialProfileType;
 
 class UpdateSocialProfileRequest extends FormRequest
 {

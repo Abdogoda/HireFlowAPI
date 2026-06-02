@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Enums\Users\SocialProfileType;
+use App\Enums\SocialProfileType;
 
 #[Fillable(['user_id', 'social_profile_type', 'profile_url'])]
 class SocialProfile extends Model

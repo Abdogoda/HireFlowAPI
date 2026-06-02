@@ -1,7 +1,6 @@
 <?php
 
-use App\Enums\Authorization\CompanyRoles;
-use App\Enums\Company\SocialProfileType;
+use App\Enums\SocialProfileType;
 
 beforeEach(function () {
     $this->createDefaultRoles();
