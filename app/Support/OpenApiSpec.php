@@ -351,7 +351,7 @@ final class OpenApiSpec
                             'email_verified_at' => ['type' => 'string', 'nullable' => true, 'format' => 'date-time'],
                             'role' => ['$ref' => '#/components/schemas/Role'],
                             'created_at' => ['type' => 'string', 'format' => 'date-time'],
-                            'company_role' => ['type' => 'string', 'example' => 'company_owner'],
+                            'company_role' => ['type' => 'string', 'example' => 'owner'],
                         ],
                     ],
                     'StoreCompanyRequest' => [
@@ -391,26 +391,51 @@ final class OpenApiSpec
                     ],
                     'StoreCompanyPersonRequest' => [
                         'type' => 'object',
-                        'required' => ['user_id', 'company_role', 'position'],
+                        'required' => ['member_id', 'company_role', 'position'],
                         'properties' => [
-                            'user_id' => ['type' => 'integer', 'example' => 2],
-                            'company_role' => ['type' => 'string', 'enum' => ['company_owner', 'admin', 'recruiter', 'candidate'], 'example' => 'recruiter'],
-                            'position' => ['type' => 'string', 'example' => 'Developer'],
-                            'information' => ['type' => 'string', 'nullable' => true, 'example' => 'Works on backend features'],
-                            'start_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-01-01'],
-                            'end_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-12-31'],
+                            'member_id'           => ['type' => 'integer', 'example' => 2],
+                            'company_role'        => ['type' => 'string', 'enum' => ['owner', 'admin', 'recruiter', 'employee'], 'example' => 'recruiter'],
+                            'position'            => ['type' => 'string', 'example' => 'Developer'],
+                            'information'         => ['type' => 'string', 'nullable' => true, 'example' => 'Works on backend features'],
+                            'start_date'          => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-01-01'],
+                            'end_date'            => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-12-31'],
                             'is_current_position' => ['type' => 'boolean', 'nullable' => true, 'example' => true],
                         ],
                     ],
                     'UpdateCompanyPersonRequest' => [
                         'type' => 'object',
                         'properties' => [
-                            'company_role' => ['type' => 'string', 'enum' => ['company_owner', 'admin', 'recruiter', 'candidate'], 'example' => 'admin'],
-                            'position' => ['type' => 'string', 'example' => 'Operations Lead'],
-                            'information' => ['type' => 'string', 'nullable' => true, 'example' => 'Handles recruiting operations'],
-                            'start_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-02-01'],
-                            'end_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-12-31'],
+                            'company_role'        => ['type' => 'string', 'enum' => ['owner', 'admin', 'recruiter', 'employee'], 'example' => 'admin'],
+                            'position'            => ['type' => 'string', 'example' => 'Operations Lead'],
+                            'information'         => ['type' => 'string', 'nullable' => true, 'example' => 'Handles recruiting operations'],
+                            'start_date'          => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-02-01'],
+                            'end_date'            => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-12-31'],
                             'is_current_position' => ['type' => 'boolean', 'nullable' => true, 'example' => true],
+                        ],
+                    ],
+                    'CompanySocialProfile' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id'                  => ['type' => 'integer', 'example' => 1],
+                            'social_profile_type' => ['type' => 'integer', 'example' => 1, 'description' => '1=LinkedIn, 2=GitHub, 3=Twitter, 4=Facebook, 5=Instagram, 6=TikTok, 7=Discord, 8=YouTube, 9=Website, 10=Other'],
+                            'profile_url'         => ['type' => 'string', 'format' => 'uri', 'example' => 'https://linkedin.com/company/acme'],
+                            'created_at'          => ['type' => 'string', 'format' => 'date-time'],
+                            'updated_at'          => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'StoreCompanySocialProfileRequest' => [
+                        'type' => 'object',
+                        'required' => ['social_profile_type', 'profile_url'],
+                        'properties' => [
+                            'social_profile_type' => ['type' => 'integer', 'enum' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'example' => 1],
+                            'profile_url'         => ['type' => 'string', 'format' => 'uri', 'example' => 'https://linkedin.com/company/acme'],
+                        ],
+                    ],
+                    'UpdateCompanySocialProfileRequest' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'social_profile_type' => ['type' => 'integer', 'enum' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'example' => 2],
+                            'profile_url'         => ['type' => 'string', 'format' => 'uri', 'example' => 'https://github.com/acme'],
                         ],
                     ],
                 ],
@@ -987,6 +1012,20 @@ final class OpenApiSpec
                 ),
             ],
             '/companies/{company}/people' => [
+                'get' => self::operation(
+                    'List all people in a company',
+                    'Company',
+                    null,
+                    self::success('Company members retrieved successfully', [
+                        'members' => [self::companyPersonExample()],
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('company', 'path', 'integer', 'Company id')],
+                ),
                 'post' => self::operation(
                     'Add a person to a company',
                     'Company',
@@ -1037,6 +1076,91 @@ final class OpenApiSpec
                     [
                         self::parameter('company', 'path', 'integer', 'Company id'),
                         self::parameter('membership', 'path', 'integer', 'Company membership id'),
+                    ],
+                ),
+            ],
+            '/companies/{company}/social-profiles' => [
+                'get' => self::operation(
+                    'List all social profiles for a company',
+                    'Company',
+                    null,
+                    self::success('Company social profiles retrieved successfully', [
+                        'social_profiles' => [self::companySocialProfileExample()],
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('company', 'path', 'integer', 'Company id')],
+                ),
+                'post' => self::operation(
+                    'Add a social profile to a company',
+                    'Company',
+                    self::requestBody('#/components/schemas/StoreCompanySocialProfileRequest'),
+                    self::success('Company social profile created successfully', [
+                        'social_profile' => self::companySocialProfileExample(),
+                    ], 201),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to manage this company'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                    [self::parameter('company', 'path', 'integer', 'Company id')],
+                ),
+            ],
+            '/companies/{company}/social-profiles/{socialProfile}' => [
+                'get' => self::operation(
+                    'Get a specific company social profile',
+                    'Company',
+                    null,
+                    self::success('Company social profile retrieved successfully', [
+                        'social_profile' => self::companySocialProfileExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('This social profile does not belong to this company'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [
+                        self::parameter('company', 'path', 'integer', 'Company id'),
+                        self::parameter('socialProfile', 'path', 'integer', 'Social profile id'),
+                    ],
+                ),
+                'patch' => self::operation(
+                    'Update a company social profile',
+                    'Company',
+                    self::requestBody('#/components/schemas/UpdateCompanySocialProfileRequest'),
+                    self::success('Company social profile updated successfully', [
+                        'social_profile' => self::companySocialProfileExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to manage this company'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                    [
+                        self::parameter('company', 'path', 'integer', 'Company id'),
+                        self::parameter('socialProfile', 'path', 'integer', 'Social profile id'),
+                    ],
+                ),
+                'delete' => self::operation(
+                    'Delete a company social profile',
+                    'Company',
+                    null,
+                    self::success('Company social profile deleted successfully', null),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to manage this company'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [
+                        self::parameter('company', 'path', 'integer', 'Company id'),
+                        self::parameter('socialProfile', 'path', 'integer', 'Social profile id'),
                     ],
                 ),
             ],
@@ -1303,10 +1427,21 @@ final class OpenApiSpec
         ];
     }
 
+    private static function companySocialProfileExample(): array
+    {
+        return [
+            'id'                  => 1,
+            'social_profile_type' => 1,
+            'profile_url'         => 'https://linkedin.com/company/acme',
+            'created_at'          => '2026-05-22T00:00:00+00:00',
+            'updated_at'          => '2026-05-22T00:00:00+00:00',
+        ];
+    }
+
     private static function companyOwnerExample(): array
     {
         return self::userSimpleExample() + [
-            'company_role' => 'company_owner',
+            'company_role' => 'owner',
         ];
     }
 }

@@ -8,8 +8,8 @@ enum CompanyRoles: string
 {
     use BaseEnum;
 
-    case OWNER = 'company_owner';
+    case OWNER = 'owner';
     case ADMIN = 'admin';
     case RECRUITER = 'recruiter';
-    case CANDIDATE = 'candidate';
+    case EMPLOYEE = 'employee';
 }

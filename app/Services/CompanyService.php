@@ -22,7 +22,7 @@ class CompanyService
     public function getCompanies(array $filters = []): Collection
     {
         return $this->applyCompanyFilters(
-            Company::query()->with(['owner', 'memberships.user']),
+            Company::query()->with(['owner', 'memberships.member']),
             $filters
         )->get();
     }
@@ -34,11 +34,11 @@ class CompanyService
                 ->where(function (Builder $builder) use ($user) {
                     $builder->where('created_by', $user->id)
                         ->orWhereHas('memberships', function (Builder $membershipQuery) use ($user) {
-                            $membershipQuery->where('user_id', $user->id)
+                            $membershipQuery->where('member_id', $user->id)
                                 ->where('is_current_position', true);
                         });
                 })
-                ->with(['owner', 'memberships.user']),
+                ->with(['owner', 'memberships.member']),
             $filters
         )->get();
     }
@@ -52,7 +52,7 @@ class CompanyService
         $company = $user->ownedCompanies()->create($data);
 
         $company->memberships()->create([
-            'user_id' => $user->id,
+            'member_id' => $user->id,
             'company_role' => CompanyRoles::OWNER->value,
             'position' => 'Company Owner',
             'information' => $data['information'] ?? null,
@@ -67,14 +67,14 @@ class CompanyService
             $user
         ));
 
-        return new CompanyResource($company->load(['owner', 'memberships.user']));
+        return new CompanyResource($company->load(['owner', 'memberships.member']));
     }
 
     public function updateCompany(Company $company, array $data): CompanyResource
     {
         $company->update($data);
 
-        return new CompanyResource($company->load(['owner', 'memberships.user']));
+        return new CompanyResource($company->load(['owner', 'memberships.member']));
     }
 
     public function deleteCompany(Company $company): bool
@@ -88,7 +88,7 @@ class CompanyService
     {
         CompanyMembership::query()
             ->where('company_id', $company->id)
-            ->where('user_id', $data['user_id'])
+            ->where('member_id', $data['member_id'])
             ->where('is_current_position', true)
             ->update([
                 'is_current_position' => false,
@@ -96,16 +96,16 @@ class CompanyService
             ]);
 
         $membership = $company->memberships()->create([
-            'user_id' => $data['user_id'],
+            'member_id' => $data['member_id'],
             'company_role' => $data['company_role'],
             'position' => $data['position'],
             'information' => $data['information'] ?? null,
             'start_date' => $data['start_date'] ?? now()->toDateString(),
             'end_date' => $data['end_date'] ?? null,
             'is_current_position' => $data['is_current_position'] ?? true,
-        ])->load('user');
+        ])->load('member');
 
-        $membership->user?->notify(new CompanyMemberAddedNotification(
+        $membership->member?->notify(new CompanyMemberAddedNotification(
             $company->load('owner'),
             $membership,
             auth()->user()
@@ -123,7 +123,7 @@ class CompanyService
         if (array_key_exists('is_current_position', $data) && $data['is_current_position'] === true) {
             CompanyMembership::query()
                 ->where('company_id', $company->id)
-                ->where('user_id', $membership->user_id)
+                ->where('member_id', $membership->member_id)
                 ->where('id', '!=', $membership->id)
                 ->where('is_current_position', true)
                 ->update([
@@ -141,7 +141,7 @@ class CompanyService
             'is_current_position' => $data['is_current_position'] ?? null,
         ], static fn ($value) => $value !== null));
 
-        return new CompanyPersonResource($membership->fresh()->load('user'));
+        return new CompanyPersonResource($membership->fresh()->load('member'));
     }
 
     public function removePerson(Company $company, CompanyMembership $membership): bool
@@ -155,7 +155,7 @@ class CompanyService
             'end_date' => $membership->end_date ?? Carbon::today()->toDateString(),
         ]);
 
-        $membership->user?->notify(new CompanyMemberRemovedNotification(
+        $membership->member?->notify(new CompanyMemberRemovedNotification(
             $company->load('owner'),
             $membership,
             auth()->user()

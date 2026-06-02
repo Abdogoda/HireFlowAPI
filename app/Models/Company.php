@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\CompanyMembership;
+use App\Models\CompanySocialProfile;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,5 +20,10 @@ class Company extends Model
     public function memberships(): HasMany
     {
         return $this->hasMany(CompanyMembership::class);
+    }
+
+    public function socialProfiles(): HasMany
+    {
+        return $this->hasMany(CompanySocialProfile::class);
     }
 }

@@ -15,7 +15,7 @@ class StoreCompanyPersonRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:users,id',
+            'member_id' => 'required|exists:users,id',
             'company_role' => 'required|in:' . CompanyRoles::toString(),
             'position' => 'required|string|max:255',
             'information' => 'sometimes|nullable|string',

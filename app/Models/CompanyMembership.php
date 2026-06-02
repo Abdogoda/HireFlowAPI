@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['company_id', 'user_id', 'company_role', 'position', 'information', 'start_date', 'end_date', 'is_current_position'])]
+#[Fillable(['company_id', 'member_id', 'company_role', 'position', 'information', 'start_date', 'end_date', 'is_current_position'])]
 class CompanyMembership extends Model
 {
     protected function casts(): array
@@ -23,8 +23,8 @@ class CompanyMembership extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function user(): BelongsTo
+    public function member(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'member_id');
     }
 }

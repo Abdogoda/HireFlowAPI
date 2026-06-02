@@ -44,7 +44,7 @@ describe('Company Show and My Companies', function () {
             ]);
 
             $memberCompany->memberships()->create([
-                'user_id' => $user->id,
+                'member_id' => $user->id,
                 'company_role' => CompanyRoles::RECRUITER->value,
                 'position' => 'Recruiter',
                 'start_date' => now()->toDateString(),

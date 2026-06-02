@@ -4,7 +4,7 @@ HireFlow API is a modern recruitment and talent acquisition platform backend bui
 
 ## 🚀 Key Features
 
-- **Robust Authentication**: 
+- **Robust Authentication**:
   - User registration and role assignment.
   - Secure API token authentication powered by **Laravel Sanctum**.
   - Password reset workflows.
@@ -16,12 +16,13 @@ HireFlow API is a modern recruitment and talent acquisition platform backend bui
   - Multi-CV/Resume PDF file management (allowing setting a primary CV).
   - Project portfolio showcase (with technologies, URLs, and date ranges).
   - Skills tracking with proficiency levels and years of experience.
-  - Social profiles integrations (LinkedIn, GitHub, etc.).
+  - Social profile integrations (LinkedIn, GitHub, Twitter, and more).
 - **Company Management**:
-  - Creation and update of company records (slug, logo, size, industry, etc.).
-  - Company member (people) management with granular role mapping (`Admin`, `Recruiter`, `Candidate`).
+  - Creation and management of company records (slug, logo, size, industry, etc.).
+  - Company people management with granular role mapping (`Owner`, `Admin`, `Recruiter`, `Employee`).
+  - Company social profile integrations (LinkedIn, GitHub, Twitter, and more) — mirroring the per-user social profile system.
 - **Interactive API Documentation**:
-  - Live swagger documentation served directly from the application.
+  - Live Swagger UI documentation served directly from the application.
 
 ---
 
@@ -70,7 +71,7 @@ If you prefer to set up the project manually step-by-step:
    ```
 
 3. **Configure Environment Variables**:
-   Copy the example environment file and generate a application key:
+   Copy the example environment file and generate an application key:
    ```bash
    cp .env.example .env
    php artisan key:generate
@@ -81,7 +82,7 @@ If you prefer to set up the project manually step-by-step:
    ```bash
    # Create database file (if using SQLite)
    touch database/database.sqlite
-   
+
    # Run migrations and seed roles/default users
    php artisan migrate --seed
    ```
@@ -123,23 +124,54 @@ An interactive API documentation console is built directly into the project usin
 
 All routes are prefixed with `/api`.
 
-| Route | Method | Description | Authentication |
+#### Authentication
+
+| Route | Method | Description | Auth |
 |---|---|---|---|
 | `/auth/register` | `POST` | Register a new account | Public |
 | `/auth/login` | `POST` | Log in and receive Sanctum token | Public |
 | `/auth/forgot-password` | `POST` | Send password reset link | Public |
 | `/auth/reset-password` | `POST` | Reset password using token | Public |
-| `/auth/verify-email/{id}/{hash}`| `GET` | Verify email address (Signed URL) | Public (Signed) |
+| `/auth/verify-email/{id}/{hash}` | `GET` | Verify email address (Signed URL) | Public (Signed) |
 | `/auth/logout` | `POST` | Log out and revoke active token | Protected |
 | `/auth/refresh-token` | `POST` | Revoke current and issue new token | Protected |
-| `/profile` | `GET/PATCH` | Retrieve or update basic profile details | Protected |
-| `/profile/avatar` | `POST/DELETE`| Store or delete profile avatar image | Protected |
-| `/profile/cvs` | `GET/POST` | List or upload CV files | Protected |
-| `/profile/projects` | `GET/POST` | Manage portfolio projects | Protected |
-| `/profile/skills` | `GET/POST` | Manage profile skills | Protected |
-| `/companies` | `GET/POST` | List or register new companies | Protected |
-| `/companies/my` | `GET` | Get user's managed companies | Protected |
-| `/companies/{company}/people` | `POST` | Add member to a company | Protected |
+| `/auth/resend-verification-email` | `POST` | Resend the email verification link | Protected |
+
+#### Profile
+
+| Route | Method | Description | Auth |
+|---|---|---|---|
+| `/profile` | `GET / PATCH` | Retrieve or update profile details | Protected |
+| `/profile/avatar` | `POST / DELETE` | Store or delete profile avatar | Protected |
+| `/profile/picture` | `POST / DELETE` | Store or delete profile picture/thumbnail | Protected |
+| `/profile/cvs` | `GET / POST` | List or upload CV files | Protected |
+| `/profile/cvs/{cv}` | `GET / DELETE` | Retrieve or delete a specific CV | Protected |
+| `/profile/projects` | `GET / POST` | List or create portfolio projects | Protected |
+| `/profile/projects/{project}` | `GET / PATCH / DELETE` | Retrieve, update or delete a project | Protected |
+| `/profile/skills` | `GET / POST` | List or create skills | Protected |
+| `/profile/skills/{skill}` | `GET / PATCH / DELETE` | Retrieve, update or delete a skill | Protected |
+| `/profile/social-profiles` | `GET / POST` | List or create social profiles | Protected |
+| `/profile/social-profiles/{socialProfile}` | `GET / PATCH / DELETE` | Retrieve, update or delete a social profile | Protected |
+
+#### Companies
+
+| Route | Method | Description | Auth |
+|---|---|---|---|
+| `/companies` | `GET` | List all companies (with search & filters) | Protected |
+| `/companies` | `POST` | Create a new company | Protected |
+| `/companies/my` | `GET` | Get authenticated user's companies | Protected |
+| `/companies/{company}` | `GET` | Retrieve a specific company | Protected |
+| `/companies/{company}` | `PATCH` | Update a company | Protected (Owner/Admin) |
+| `/companies/{company}` | `DELETE` | Delete a company | Protected (Owner/Admin) |
+| `/companies/{company}/people` | `GET` | List all people in a company | Protected |
+| `/companies/{company}/people` | `POST` | Add a person to a company | Protected (Owner/Admin) |
+| `/companies/{company}/people/{membership}` | `PATCH` | Update a member's membership record | Protected (Owner/Admin) |
+| `/companies/{company}/people/{membership}` | `DELETE` | Remove a member from a company | Protected (Owner/Admin) |
+| `/companies/{company}/social-profiles` | `GET` | List a company's social profiles | Protected |
+| `/companies/{company}/social-profiles` | `POST` | Add a social profile to a company | Protected (Owner/Admin) |
+| `/companies/{company}/social-profiles/{socialProfile}` | `GET` | Retrieve a specific company social profile | Protected |
+| `/companies/{company}/social-profiles/{socialProfile}` | `PATCH` | Update a company social profile | Protected (Owner/Admin) |
+| `/companies/{company}/social-profiles/{socialProfile}` | `DELETE` | Delete a company social profile | Protected (Owner/Admin) |
 
 ---
 
@@ -156,15 +188,20 @@ Or manually using the Artisan runner:
 php artisan test
 ```
 
+The suite currently covers **159 tests** with **578 assertions** across Auth, Profile, and Company feature areas.
+
 ---
 
 ## 📂 Project Structure
 
 Here are the key directories containing the main domain logic:
 
-- `app/Http/Controllers/` - API Controllers grouped by domains (`Auth`, `Profile`, `Company`).
-- `app/Models/` - Eloquent models detailing relations and properties.
-- `app/Services/` - Business logic layer (e.g. `AuthService`).
-- `app/Support/OpenApiSpec.php` - Static definitions and builder for OpenAPI/Swagger documentation.
-- `routes/api/` - Modular route definition files (`auth.php`, `company.php`, `profile.php`).
-- `tests/` - Feature and Unit tests using Pest.
+- `app/Http/Controllers/` — API Controllers grouped by domains (`Auth`, `Profile`, `Company`).
+- `app/Models/` — Eloquent models detailing relations and properties.
+- `app/Policies/` — Authorization policies (e.g. `CompanyPolicy`).
+- `app/Services/` — Business logic layer (e.g. `CompanyService`, `AuthService`).
+- `app/Enums/` — Typed enums for roles (`CompanyRoles`), social profile types, etc.
+- `app/Support/OpenApiSpec.php` — Static definitions and builder for OpenAPI/Swagger documentation.
+- `database/migrations/` — Database schema migrations.
+- `routes/api/` — Modular route definition files (`auth.php`, `company.php`, `profile.php`).
+- `tests/` — Feature and Unit tests using Pest.

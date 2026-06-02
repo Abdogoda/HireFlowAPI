@@ -70,9 +70,9 @@ describe('Create Company', function () {
             ]);
 
             $this->assertDatabaseHas('company_memberships', [
-                'company_role' => 'company_owner',
+                'company_role' => 'owner',
                 'position' => 'Company Owner',
-                'user_id' => $user->id,
+                'member_id' => $user->id,
             ]);
 
             Notification::assertSentTo($user, CompanyMemberAddedNotification::class);

@@ -24,7 +24,7 @@ describe('Company Member Endpoints', function () {
         ]);
 
         $company->memberships()->create([
-            'user_id' => $owner->id,
+            'member_id' => $owner->id,
             'company_role' => CompanyRoles::OWNER->value,
             'position' => 'Company Owner',
             'start_date' => now()->toDateString(),
@@ -33,7 +33,7 @@ describe('Company Member Endpoints', function () {
 
         $response = $this->actingAs($owner)
             ->postJson("/api/companies/{$company->id}/people", [
-                'user_id' => $person->id,
+                'member_id' => $person->id,
                 'company_role' => CompanyRoles::RECRUITER->value,
                 'position' => 'Developer',
                 'information' => 'Works on backend features',
@@ -53,7 +53,7 @@ describe('Company Member Endpoints', function () {
 
         $this->assertDatabaseHas('company_memberships', [
             'company_id' => $company->id,
-            'user_id' => $person->id,
+            'member_id' => $person->id,
             'company_role' => 'recruiter',
             'position' => 'Developer',
             'is_current_position' => 1,
@@ -72,7 +72,7 @@ describe('Company Member Endpoints', function () {
         ]);
 
         $company->memberships()->create([
-            'user_id' => $owner->id,
+            'member_id' => $owner->id,
             'company_role' => CompanyRoles::OWNER->value,
             'position' => 'Company Owner',
             'start_date' => now()->toDateString(),
@@ -80,8 +80,8 @@ describe('Company Member Endpoints', function () {
         ]);
 
         $membership = $company->memberships()->create([
-            'user_id' => $person->id,
-            'company_role' => CompanyRoles::CANDIDATE->value,
+            'member_id' => $person->id,
+            'company_role' => CompanyRoles::EMPLOYEE->value,
             'position' => 'Junior Developer',
             'start_date' => '2026-01-01',
             'is_current_position' => true,
@@ -122,7 +122,7 @@ describe('Company Member Endpoints', function () {
         ]);
 
         $company->memberships()->create([
-            'user_id' => $owner->id,
+            'member_id' => $owner->id,
             'company_role' => CompanyRoles::OWNER->value,
             'position' => 'Company Owner',
             'start_date' => now()->toDateString(),
@@ -130,8 +130,8 @@ describe('Company Member Endpoints', function () {
         ]);
 
         $membership = $company->memberships()->create([
-            'user_id' => $person->id,
-            'company_role' => CompanyRoles::CANDIDATE->value,
+            'member_id' => $person->id,
+            'company_role' => CompanyRoles::EMPLOYEE->value,
             'position' => 'Analyst',
             'start_date' => '2026-01-01',
             'is_current_position' => true,
@@ -164,7 +164,7 @@ describe('Company Member Endpoints', function () {
         ]);
 
         $company->memberships()->create([
-            'user_id' => $owner->id,
+            'member_id' => $owner->id,
             'company_role' => CompanyRoles::OWNER->value,
             'position' => 'Company Owner',
             'start_date' => now()->toDateString(),
@@ -172,8 +172,8 @@ describe('Company Member Endpoints', function () {
         ]);
 
         $company->memberships()->create([
-            'user_id' => $member->id,
-            'company_role' => CompanyRoles::CANDIDATE->value,
+            'member_id' => $member->id,
+            'company_role' => CompanyRoles::EMPLOYEE->value,
             'position' => 'Analyst',
             'start_date' => now()->toDateString(),
             'is_current_position' => true,
@@ -181,7 +181,7 @@ describe('Company Member Endpoints', function () {
 
         $response = $this->actingAs($member)
             ->postJson("/api/companies/{$company->id}/people", [
-                'user_id' => $target->id,
+                'member_id' => $target->id,
                 'company_role' => CompanyRoles::RECRUITER->value,
                 'position' => 'Recruiter',
                 'start_date' => '2026-05-01',
@@ -200,7 +200,7 @@ describe('Company Member Endpoints', function () {
         ]);
 
         $company->memberships()->create([
-            'user_id' => $owner->id,
+            'member_id' => $owner->id,
             'company_role' => CompanyRoles::OWNER->value,
             'position' => 'Company Owner',
             'start_date' => now()->toDateString(),
@@ -208,8 +208,8 @@ describe('Company Member Endpoints', function () {
         ]);
 
         $first = $company->memberships()->create([
-            'user_id' => $person->id,
-            'company_role' => CompanyRoles::CANDIDATE->value,
+            'member_id' => $person->id,
+            'company_role' => CompanyRoles::EMPLOYEE->value,
             'position' => 'Junior Developer',
             'start_date' => '2026-01-01',
             'is_current_position' => true,
@@ -217,7 +217,7 @@ describe('Company Member Endpoints', function () {
 
         $this->actingAs($owner)
             ->postJson("/api/companies/{$company->id}/people", [
-                'user_id' => $person->id,
+                'member_id' => $person->id,
                 'company_role' => CompanyRoles::RECRUITER->value,
                 'position' => 'Senior Developer',
                 'start_date' => '2026-05-01',
@@ -232,7 +232,7 @@ describe('Company Member Endpoints', function () {
 
         $this->assertDatabaseHas('company_memberships', [
             'company_id' => $company->id,
-            'user_id' => $person->id,
+            'member_id' => $person->id,
             'company_role' => 'recruiter',
             'position' => 'Senior Developer',
             'is_current_position' => 1,

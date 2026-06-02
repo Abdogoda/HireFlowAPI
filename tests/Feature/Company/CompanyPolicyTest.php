@@ -20,7 +20,7 @@ describe('Company Policy', function () {
             ]);
 
             $company->memberships()->create([
-                'user_id' => $owner->id,
+                'member_id' => $owner->id,
                 'company_role' => CompanyRoles::OWNER->value,
                 'position' => 'Company Owner',
                 'start_date' => now()->toDateString(),
@@ -28,8 +28,8 @@ describe('Company Policy', function () {
             ]);
 
             $company->memberships()->create([
-                'user_id' => $member->id,
-                'company_role' => CompanyRoles::CANDIDATE->value,
+                'member_id' => $member->id,
+                'company_role' => CompanyRoles::EMPLOYEE->value,
                 'position' => 'Analyst',
                 'start_date' => now()->toDateString(),
                 'is_current_position' => true,
@@ -52,7 +52,7 @@ describe('Company Policy', function () {
             ]);
 
             $company->memberships()->create([
-                'user_id' => $owner->id,
+                'member_id' => $owner->id,
                 'company_role' => CompanyRoles::OWNER->value,
                 'position' => 'Company Owner',
                 'start_date' => now()->toDateString(),
@@ -60,7 +60,7 @@ describe('Company Policy', function () {
             ]);
 
             $company->memberships()->create([
-                'user_id' => $admin->id,
+                'member_id' => $admin->id,
                 'company_role' => CompanyRoles::ADMIN->value,
                 'position' => 'Operations Lead',
                 'start_date' => now()->toDateString(),
@@ -68,8 +68,8 @@ describe('Company Policy', function () {
             ]);
 
             $company->memberships()->create([
-                'user_id' => $member->id,
-                'company_role' => CompanyRoles::CANDIDATE->value,
+                'member_id' => $member->id,
+                'company_role' => CompanyRoles::EMPLOYEE->value,
                 'position' => 'Analyst',
                 'start_date' => now()->toDateString(),
                 'is_current_position' => true,

@@ -13,6 +13,15 @@ use Illuminate\Http\Request;
 
 class CompanyMemberController extends Controller
 {
+    public function index(Request $request, Company $company): JsonResponse
+    {
+        $members = $company->memberships()->with('member')->get();
+
+        return $this->successResponse(
+            ['members' => $members],
+            'Company members retrieved successfully'
+        );
+    }
     public function store(StoreCompanyPersonRequest $request, Company $company, CompanyService $companyService): JsonResponse
     {
         $this->authorize('managePeople', $company);

@@ -53,7 +53,7 @@ class CompanyController extends Controller
     public function show(Request $request, Company $company): JsonResponse
     {
         return $this->successResponse(
-            ['company' => new CompanyResource($company->load(['owner', 'memberships.user']))],
+            ['company' => new CompanyResource($company->load(['owner', 'memberships.member']))],
             'Company retrieved successfully'
         );
     }

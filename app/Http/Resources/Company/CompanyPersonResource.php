@@ -19,7 +19,7 @@ class CompanyPersonResource extends JsonResource
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'is_current_position' => $this->is_current_position,
-            'user' => new UserSimpleResource($this->whenLoaded('user')),
+            'user' => new UserSimpleResource($this->whenLoaded('member')),
             'is_company_owner' => $this->company_role === CompanyRoles::OWNER->value,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

@@ -22,7 +22,7 @@ class CompanyPolicy
     {
         return $company->created_by === $user->id
             || $company->memberships()
-                ->where('user_id', $user->id)
+                ->where('member_id', $user->id)
                 ->where('company_role', CompanyRoles::ADMIN->value)
                 ->where('is_current_position', true)
                 ->exists();
