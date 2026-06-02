@@ -35,13 +35,25 @@ trait BaseEnum
 
     public static function toButifyStructure(): array
     {
+        // Deprecated: use `toBeautifyStructure()` instead
+        @trigger_error('Method ' . __METHOD__ . ' is deprecated, use toBeautifyStructure() instead', E_USER_DEPRECATED);
+
         $data = [];
 
         foreach (self::toArray() as $key => $value) {
-            $data[] = self::getButifyStructureByKey($key);
+            $data[] = self::getBeautifyStructureByKey($key);
         }
 
         return $data;
+    }
+
+    /**
+     * Correctly-spelled wrapper for legacy `toButifyStructure()`.
+     * @return array
+     */
+    public static function toBeautifyStructure(): array
+    {
+        return self::toButifyStructure();
     }
 
     public static function getButifyStructureByKey($key): array
@@ -53,15 +65,33 @@ trait BaseEnum
         ];
     }
 
-    public static function getButifyStructure($value): array
+    /**
+     * Correctly-spelled wrapper for legacy `getButifyStructureByKey()`.
+     */
+    public static function getBeautifyStructureByKey($key): array
     {
-        $key = self::getKey($value);
         return self::getButifyStructureByKey($key);
     }
 
-    public static function getKey($value): string
+    public static function getButifyStructure($value): array
     {
-        return array_search($value, self::toArray());
+        @trigger_error('Method ' . __METHOD__ . ' is deprecated, use getBeautifyStructure() instead', E_USER_DEPRECATED);
+
+        return self::getBeautifyStructure($value);
+    }
+
+    /**
+     * Correctly-spelled wrapper for legacy `getButifyStructure()`.
+     */
+    public static function getBeautifyStructure($value): array
+    {
+        return self::getButifyStructure($value);
+    }
+
+    public static function getKey($value): ?string
+    {
+        $key = array_search($value, self::toArray(), true);
+        return $key === false ? null : (string) $key;
     }
 
     public static function getValue(self|string $key): mixed

@@ -10,5 +10,5 @@ enum Roles: string
 
     case ADMIN       = 'admin';
     case CANDIDATE   = 'candidate';
-    case RECRUTER    = 'recruter';
+    case RECRUITER   = 'recruiter';
 }

@@ -65,4 +65,68 @@ enum ErrorType: string
 
     // 500 Internal Server Error
     case INTERNAL_SERVER_ERROR = 'internal_server_error';
+
+    /**
+     * Map this error type to a suggested HTTP status code.
+     */
+    public function toHttpStatus(): int
+    {
+        return match ($this) {
+            // 400 Bad Request
+            self::OTP_INVALID,
+            self::PERIOD_HAS_ENDED,
+            self::PERIOD_HAS_NOT_STARTED,
+            self::COURSE_HAS_ENDED,
+            self::COURSE_HAS_STARTED,
+            self::COURSE_HAS_NOT_STARTED,
+            self::ACTIVITY_HAS_ENDED,
+            self::ACTIVITY_HAS_NOT_STARTED,
+            self::LESSON_HAS_COMPLETED,
+            self::LESSON_HAS_POSTPONED,
+            self::LESSON_HAS_CANCELLED,
+            self::LESSON_IS_ONGOING,
+            self::LESSON_HAS_NOT_YET_STARTED => 400,
+
+            // 401 Unauthorized
+            self::UNAUTHENTICATED,
+            self::INVALID_CREDENTIALS => 401,
+
+            // 403 Forbidden
+            self::NOT_AUTHORIZED,
+            self::USER_NOT_ACCEPTED,
+            self::USER_IS_BLACKLISTED,
+            self::PERIOD_UPDATE_IS_LOCKED,
+            self::ROLES_ASSIGNED_TO_USERS,
+            self::SKILLS_ASSIGNED_TO_USERS,
+            self::SKILLS_ASSIGNED_TO_COURSES,
+            self::TEAM_HAS_USERS,
+            self::TEAM_HAS_MIXED_GENDER,
+            self::TEAM_HAS_LEADER,
+            self::USER_HAS_TEAM,
+            self::USER_NOT_TEAM_MEMBER,
+            self::INVALID_DOMAIN => 403,
+
+            // 404 Not Found
+            self::MODEL_NOT_FOUND => 404,
+
+            // 409 Conflict
+            self::PERIOD_ALREADY_ACTIVATED,
+            self::PERIOD_ALREADY_DEACTIVATED,
+            self::COURSE_ALREADY_ACTIVATED,
+            self::COURSE_HAS_NO_UNCOMPLETED_LESSONS_TO_HOLD,
+            self::COURSE_ALREADY_DEACTIVATED,
+            self::ACTIVITY_ALREADY_ACTIVATED,
+            self::ACTIVITY_ALREADY_DEACTIVATED,
+            self::DOCUMENT_ALREADY_EXISTS => 409,
+
+            // 410 Gone
+            self::OTP_EXPIRED => 410,
+
+            // 422 Unprocessable Entity
+            self::VALIDATION_ERROR => 422,
+
+            // default / 500
+            default => 500,
+        };
+    }
 }
