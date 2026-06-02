@@ -1,9 +1,6 @@
 <?php
 
 use App\Enums\Authorization\CompanyRoles;
-use App\Policies\CompanyPolicy;
-use App\Notifications\CompanyMemberAddedNotification;
-use Illuminate\Support\Facades\Notification;
 
 beforeEach(function () {
         $this->createDefaultRoles();
