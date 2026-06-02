@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Company;
 use App\Models\User;
 use App\Models\Vacancy;
+use App\Enums\Company\CompanyRoles;
 
 class VacancyPolicy
 {
@@ -23,12 +24,12 @@ class VacancyPolicy
         // Company owner can create vacancies for their company.
         // Members with the `recruiter` role now can create vacancies for their company.
         
-        return $company->created_by === $user->id
-            || $company->memberships()
-                ->where('member_id', $user->id)
-                ->where('company_role', 'recruiter')
-                ->where('is_current_position', true)
-                ->exists();
+        return  $company->created_by === $user->id ||
+                $company->memberships()
+                    ->where('member_id', $user->id)
+                    ->whereIn('company_role', [CompanyRoles::RECRUITER->value, CompanyRoles::ADMIN->value])
+                    ->where('is_current_position', true)
+                    ->exists();
     }
 
     public function update(User $user, Vacancy $vacancy): bool
@@ -37,13 +38,13 @@ class VacancyPolicy
         // Company owner can update any vacancy of their company.
         // Members with the `recruiter` role now can update vacancies of their company.
 
-        return $vacancy->created_by === $user->id
-            || $vacancy->company->created_by === $user->id
-            || $vacancy->company->memberships()
-                ->where('member_id', $user->id)
-                ->where('company_role', 'recruiter')
-                ->where('is_current_position', true)
-                ->exists();
+        return  $vacancy->created_by === $user->id ||
+                $vacancy->company->created_by === $user->id ||
+                $vacancy->company->memberships()
+                    ->where('member_id', $user->id)
+                    ->whereIn('company_role', [CompanyRoles::RECRUITER->value, CompanyRoles::ADMIN->value])
+                    ->where('is_current_position', true)
+                    ->exists();
     }
 
     public function delete(User $user, Vacancy $vacancy): bool
