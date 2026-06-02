@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\CompanyMembership;
 use App\Models\CompanySocialProfile;
+use App\Models\Post;
 use App\Models\Vacancy;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
@@ -31,5 +32,10 @@ class Company extends Model
     public function vacancies(): HasMany
     {
         return $this->hasMany(Vacancy::class);
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
     }
 }
