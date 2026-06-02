@@ -30,9 +30,9 @@ HireFlow API is a modern recruitment and talent acquisition platform backend bui
 | Phase 14 | ⏳ Pending | Analytics Dashboard & Reporting |
 | Phase 15 | ⏳ Pending | Saved Jobs & Bookmarks |
 | Phase 16 | ⏳ Pending | Activity Logs & Audit System |
-| Phase 16 | ⏳ Pending | API Documentation (Swagger/OpenAPI) |
-| Phase 17 | ⏳ Pending | Testing Suite (Unit + Feature Tests) |
-| Phase 18 | ⏳ Pending | Performance Optimization & Caching |
+| Phase 17 | ⏳ Pending | Performance Optimization & Caching |
+| Phase 18 | 🚧 In Progress | API Documentation (Swagger/OpenAPI) |
+| Phase 19 | 🚧 In Progress | Testing Suite (Unit + Feature Tests) |
 ---
 
 ## 🚀 Key Features
