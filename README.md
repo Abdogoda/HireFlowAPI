@@ -1,3 +1,9 @@
+# 🚧 WORK IN PROGRESS 🚧
+
+> **Note:** This project is currently under development, expect changes and updates frequently.
+
+---
+
 # HireFlow API
 
 HireFlow API is a modern recruitment and talent acquisition platform backend built using Laravel. It provides comprehensive endpoints for candidate profiling, company administration, and role-based access control.
