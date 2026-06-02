@@ -6,6 +6,10 @@ HireFlow API is a modern recruitment and talent acquisition platform backend bui
 
 > **Note:** This project is currently under development, expect changes and updates frequently.
 
+![Project Status](https://img.shields.io/badge/status-active%20development-yellow)
+![Completion](https://img.shields.io/badge/completion-25%25-brightgreen)
+![Tests](https://img.shields.io/badge/tests-173%20passed-success)
+
 ## 🗺️ Development Roadmap
 
 | Phase | Status | Features |
