@@ -1,12 +1,35 @@
+# HireFlow API
+
+HireFlow API is a modern recruitment and talent acquisition platform backend built using Laravel. It provides comprehensive endpoints for candidate profiling, company administration, and role-based access control.
+
 # 🚧 WORK IN PROGRESS 🚧
 
 > **Note:** This project is currently under development, expect changes and updates frequently.
 
+## 🗺️ Development Roadmap
+
+| Phase | Status | Features |
+|------|--------|----------|
+| Phase 1 | ✅ Complete | Authentication, Email Verification, Password Reset, RBAC |
+| Phase 2 | ✅ Complete | Company Management, Company Members, Roles & Permissions |
+| Phase 3 | ✅ Complete | Candidate Profiles, Skills, CV Upload, Portfolio |
+| Phase 4 | ✅ Complete | Job Management, Job Search, Filtering, Sorting |
+| Phase 5 | ✅ Complete | Posts (Personal & Company), Post Categories, Post Tags |
+| Phase 6 | 🚧 In Progress | Job Applications System, Application Workflow |
+| Phase 7 | ⏳ Pending | Interview Scheduling, Interview Management |
+| Phase 8 | ⏳ Pending | Notifications System (Email + Database) |
+| Phase 9 | ⏳ Pending | AI Profile Match Scoring (Credits System) |
+| Phase 10 | ⏳ Pending | AI Resume Analysis & Profile Auto-Fill |
+| Phase 11 | ⏳ Pending | AI Candidate Ranking System |
+| Phase 12 | ⏳ Pending | Subscription Plans & Payments |
+| Phase 13 | ⏳ Pending | Credit System & Usage Tracking |
+| Phase 14 | ⏳ Pending | Analytics Dashboard & Reporting |
+| Phase 15 | ⏳ Pending | Saved Jobs & Bookmarks |
+| Phase 16 | ⏳ Pending | Activity Logs & Audit System |
+| Phase 16 | ⏳ Pending | API Documentation (Swagger/OpenAPI) |
+| Phase 17 | ⏳ Pending | Testing Suite (Unit + Feature Tests) |
+| Phase 18 | ⏳ Pending | Performance Optimization & Caching |
 ---
-
-# HireFlow API
-
-HireFlow API is a modern recruitment and talent acquisition platform backend built using Laravel. It provides comprehensive endpoints for candidate profiling, company administration, and role-based access control.
 
 ## 🚀 Key Features
 
