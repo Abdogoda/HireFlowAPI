@@ -23,6 +23,7 @@ final class OpenApiSpec
                 ['name' => 'Auth', 'description' => 'Authentication and account lifecycle endpoints'],
                 ['name' => 'Profile', 'description' => 'Authenticated profile and portfolio endpoints'],
                 ['name' => 'Company', 'description' => 'Company and company member management endpoints'],
+                ['name' => 'Post', 'description' => 'Personal and company post endpoints with attachments and tags'],
             ],
             'paths' => self::paths(),
             'components' => [
@@ -436,6 +437,105 @@ final class OpenApiSpec
                         'properties' => [
                             'social_profile_type' => ['type' => 'integer', 'enum' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'example' => 2],
                             'profile_url'         => ['type' => 'string', 'format' => 'uri', 'example' => 'https://github.com/acme'],
+                        ],
+                    ],
+                    'Tag' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'name' => ['type' => 'string', 'example' => 'hiring'],
+                            'slug' => ['type' => 'string', 'example' => 'hiring'],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'updated_at' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'PostAttachment' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'file_name' => ['type' => 'string', 'example' => 'brief.pdf'],
+                            'file_path' => ['type' => 'string', 'example' => 'posts/1/attachments/brief.pdf'],
+                            'file_url' => ['type' => 'string', 'format' => 'uri', 'example' => 'https://example.com/storage/posts/1/attachments/brief.pdf'],
+                            'mime_type' => ['type' => 'string', 'nullable' => true, 'example' => 'application/pdf'],
+                            'size' => ['type' => 'integer', 'nullable' => true, 'example' => 122880],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'updated_at' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'Post' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => ['type' => 'integer', 'example' => 1],
+                            'user_id' => ['type' => 'integer', 'example' => 1],
+                            'company_id' => ['type' => 'integer', 'nullable' => true, 'example' => 1],
+                            'title' => ['type' => 'string', 'example' => 'Weekly Hiring Update'],
+                            'content' => ['type' => 'string', 'example' => '<p>We are <strong>hiring</strong> engineers.</p>'],
+                            'category' => ['type' => 'string', 'enum' => ['general', 'announcement', 'update', 'event', 'news'], 'example' => 'update'],
+                            'status' => ['type' => 'string', 'enum' => ['draft', 'published', 'scheduled', 'archived'], 'example' => 'published'],
+                            'post_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-06-02'],
+                            'post_time' => ['type' => 'string', 'nullable' => true, 'example' => '10:30:00'],
+                            'author' => ['$ref' => '#/components/schemas/UserSimple'],
+                            'company' => [
+                                'nullable' => true,
+                                'type' => ['object', 'null'],
+                                'properties' => [
+                                    'id' => ['type' => 'integer', 'example' => 1],
+                                    'name' => ['type' => 'string', 'example' => 'Acme Jobs'],
+                                    'slug' => ['type' => 'string', 'example' => 'acme-jobs'],
+                                ],
+                            ],
+                            'tags' => [
+                                'type' => 'array',
+                                'items' => ['$ref' => '#/components/schemas/Tag'],
+                            ],
+                            'attachments' => [
+                                'type' => 'array',
+                                'items' => ['$ref' => '#/components/schemas/PostAttachment'],
+                            ],
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'updated_at' => ['type' => 'string', 'format' => 'date-time'],
+                        ],
+                    ],
+                    'StorePostRequest' => [
+                        'type' => 'object',
+                        'required' => ['title', 'content', 'category'],
+                        'properties' => [
+                            'company_id' => ['type' => 'integer', 'nullable' => true, 'example' => 1],
+                            'title' => ['type' => 'string', 'example' => 'Weekly Hiring Update'],
+                            'content' => ['type' => 'string', 'example' => '<p>We are <strong>hiring</strong> engineers.</p>'],
+                            'category' => ['type' => 'string', 'enum' => ['general', 'announcement', 'update', 'event', 'news'], 'example' => 'update'],
+                            'status' => ['type' => 'string', 'enum' => ['draft', 'published', 'scheduled', 'archived'], 'example' => 'published'],
+                            'post_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-06-02'],
+                            'post_time' => ['type' => 'string', 'nullable' => true, 'example' => '10:30'],
+                            'tags' => [
+                                'type' => 'array',
+                                'items' => ['type' => 'string'],
+                                'example' => ['hiring', 'engineering'],
+                            ],
+                            'attachments' => [
+                                'type' => 'array',
+                                'items' => ['type' => 'string', 'format' => 'binary'],
+                            ],
+                        ],
+                    ],
+                    'UpdatePostRequest' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'title' => ['type' => 'string', 'example' => 'Weekly Hiring Update'],
+                            'content' => ['type' => 'string', 'example' => '<p>Updated post body.</p>'],
+                            'category' => ['type' => 'string', 'enum' => ['general', 'announcement', 'update', 'event', 'news'], 'example' => 'announcement'],
+                            'status' => ['type' => 'string', 'enum' => ['draft', 'published', 'scheduled', 'archived'], 'example' => 'published'],
+                            'post_date' => ['type' => 'string', 'nullable' => true, 'format' => 'date', 'example' => '2026-06-03'],
+                            'post_time' => ['type' => 'string', 'nullable' => true, 'example' => '11:00'],
+                            'tags' => [
+                                'type' => 'array',
+                                'items' => ['type' => 'string'],
+                                'example' => ['updates', 'team'],
+                            ],
+                            'attachments' => [
+                                'type' => 'array',
+                                'items' => ['type' => 'string', 'format' => 'binary'],
+                            ],
                         ],
                     ],
                 ],
@@ -1164,6 +1264,97 @@ final class OpenApiSpec
                     ],
                 ),
             ],
+            '/posts' => [
+                'get' => self::operation(
+                    'List posts with search, filters, and pagination',
+                    'Post',
+                    null,
+                    self::success('Posts retrieved successfully', [
+                        'posts' => [self::postExample()],
+                        'pagination' => [
+                            'current_page' => 1,
+                            'total' => 1,
+                            'per_page' => 15,
+                            'last_page' => 1,
+                            'from' => 1,
+                            'to' => 1,
+                        ],
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                    ],
+                    true,
+                    [
+                        self::parameter('search', 'query', 'string', 'Search across title, content, company, and tags', false),
+                        self::parameter('company_id', 'query', 'integer', 'Filter by company id', false),
+                        self::parameter('user_id', 'query', 'integer', 'Filter by author id', false),
+                        self::parameter('category', 'query', 'string', 'Filter by category', false),
+                        self::parameter('status', 'query', 'string', 'Filter by status', false),
+                        self::parameter('tag', 'query', 'string', 'Filter by a tag name or slug', false),
+                        self::parameter('per_page', 'query', 'integer', 'Items per page', false),
+                        self::parameter('sort_by', 'query', 'string', 'Sort field: title, post_date, post_time, status, category, created_at, updated_at', false),
+                        self::parameter('sort_direction', 'query', 'string', 'Sort direction: asc or desc', false),
+                    ],
+                ),
+                'post' => self::operation(
+                    'Create a post',
+                    'Post',
+                    self::multipartBody('#/components/schemas/StorePostRequest'),
+                    self::success('Post created successfully', [
+                        'post' => self::postExample(),
+                    ], 201),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to create this post'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                ),
+            ],
+            '/posts/{post}' => [
+                'get' => self::operation(
+                    'Get a specific post',
+                    'Post',
+                    null,
+                    self::success('Post retrieved successfully', [
+                        'post' => self::postExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('post', 'path', 'integer', 'Post id')],
+                ),
+                'patch' => self::operation(
+                    'Update a post',
+                    'Post',
+                    self::multipartBody('#/components/schemas/UpdatePostRequest'),
+                    self::success('Post updated successfully', [
+                        'post' => self::postExample(),
+                    ]),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to update this post'),
+                        '422' => self::error('Validation failed'),
+                    ],
+                    true,
+                    [self::parameter('post', 'path', 'integer', 'Post id')],
+                ),
+                'delete' => self::operation(
+                    'Delete a post',
+                    'Post',
+                    null,
+                    self::success('Post deleted successfully', null),
+                    [
+                        '401' => self::error('Unauthenticated'),
+                        '403' => self::error('You do not have permission to delete this post'),
+                        '404' => self::error('Resource not found'),
+                    ],
+                    true,
+                    [self::parameter('post', 'path', 'integer', 'Post id')],
+                ),
+            ],
         ];
     }
 
@@ -1442,6 +1633,56 @@ final class OpenApiSpec
     {
         return self::userSimpleExample() + [
             'company_role' => 'owner',
+        ];
+    }
+
+    private static function postExample(): array
+    {
+        return [
+            'id' => 1,
+            'user_id' => 1,
+            'company_id' => 1,
+            'title' => 'Weekly Hiring Update',
+            'content' => '<p>We are <strong>hiring</strong> engineers.</p>',
+            'category' => 'update',
+            'status' => 'published',
+            'post_date' => '2026-06-02',
+            'post_time' => '10:30:00',
+            'author' => self::userSimpleExample(),
+            'company' => [
+                'id' => 1,
+                'name' => 'Acme Jobs',
+                'slug' => 'acme-jobs',
+            ],
+            'tags' => [self::tagExample()],
+            'attachments' => [self::postAttachmentExample()],
+            'created_at' => '2026-06-02T00:00:00+00:00',
+            'updated_at' => '2026-06-02T00:00:00+00:00',
+        ];
+    }
+
+    private static function tagExample(): array
+    {
+        return [
+            'id' => 1,
+            'name' => 'hiring',
+            'slug' => 'hiring',
+            'created_at' => '2026-06-02T00:00:00+00:00',
+            'updated_at' => '2026-06-02T00:00:00+00:00',
+        ];
+    }
+
+    private static function postAttachmentExample(): array
+    {
+        return [
+            'id' => 1,
+            'file_name' => 'brief.pdf',
+            'file_path' => 'posts/1/attachments/brief.pdf',
+            'file_url' => 'https://example.com/storage/posts/1/attachments/brief.pdf',
+            'mime_type' => 'application/pdf',
+            'size' => 122880,
+            'created_at' => '2026-06-02T00:00:00+00:00',
+            'updated_at' => '2026-06-02T00:00:00+00:00',
         ];
     }
 }

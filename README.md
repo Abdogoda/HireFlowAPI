@@ -21,6 +21,10 @@ HireFlow API is a modern recruitment and talent acquisition platform backend bui
     - Creation and management of company records (slug, logo, size, industry, etc.).
     - Company people management with granular role mapping (`Owner`, `Admin`, `Recruiter`, `Employee`).
     - Company social profile integrations (LinkedIn, GitHub, Twitter, and more) — mirroring the per-user social profile system.
+- **Posts and Updates**:
+    - Personal posts for all authenticated users.
+    - Company posts for company owners, admins, and recruiters.
+    - Rich text content with HTML support, tags, attachments, categories, publish status, and scheduled date/time fields.
 - **Interactive API Documentation**:
     - Live Swagger UI documentation served directly from the application.
 
@@ -178,6 +182,22 @@ All routes are prefixed with `/api`.
 | `/companies/{company}/social-profiles/{socialProfile}` | `PATCH`  | Update a company social profile            | Protected (Owner/Admin) |
 | `/companies/{company}/social-profiles/{socialProfile}` | `DELETE` | Delete a company social profile            | Protected (Owner/Admin) |
 
+#### Posts
+
+| Route           | Method   | Description                                          | Auth & Authorization                                |
+| --------------- | -------- | ---------------------------------------------------- | --------------------------------------------------- |
+| `/posts`        | `GET`    | List posts with search, filters, sorting, and paging | Protected                                           |
+| `/posts`        | `POST`   | Create a personal or company post                    | Protected                                           |
+| `/posts/{post}` | `GET`    | Retrieve a specific post                             | Protected                                           |
+| `/posts/{post}` | `PATCH`  | Update a post                                        | Protected (author or company owner/admin/recruiter) |
+| `/posts/{post}` | `DELETE` | Delete a post                                        | Protected (author or company owner/admin/recruiter) |
+
+Notes:
+
+- Posts support HTML content, tags, attachments, category, status, and post date/time.
+- Company post permissions follow current company membership roles: `owner`, `admin`, and `recruiter`.
+- The Swagger JSON is served from `/api/documentation.json` and reflects the same post endpoints.
+
 #### Vacancies (Jobs)
 
 | Route                  | Method   | Description                                           | Auth & Authorization                                                                                           |
@@ -210,7 +230,7 @@ Or manually using the Artisan runner:
 php artisan test
 ```
 
-The suite currently covers **159 tests** with **578 assertions** across Auth, Profile, and Company feature areas.
+The suite currently covers **169 tests** with **615 assertions** across Auth, Profile, Company, Post, and Vacancy feature areas.
 
 ---
 
@@ -218,12 +238,12 @@ The suite currently covers **159 tests** with **578 assertions** across Auth, Pr
 
 Here are the key directories containing the main domain logic:
 
-- `app/Http/Controllers/` — API Controllers grouped by domains (`Auth`, `Profile`, `Company`).
+- `app/Http/Controllers/` — API Controllers grouped by domains (`Auth`, `Profile`, `Company`, `Post`).
 - `app/Models/` — Eloquent models detailing relations and properties.
-- `app/Policies/` — Authorization policies (e.g. `CompanyPolicy`).
-- `app/Services/` — Business logic layer (e.g. `CompanyService`, `AuthService`).
-- `app/Enums/` — Typed enums for roles (`CompanyRoles`), social profile types, etc.
+- `app/Policies/` — Authorization policies (e.g. `CompanyPolicy`, `PostPolicy`).
+- `app/Services/` — Business logic layer (e.g. `CompanyService`, `PostService`, `AuthService`).
+- `app/Enums/` — Typed enums for roles (`CompanyRoles`), post categories/statuses, social profile types, etc.
 - `app/Support/OpenApiSpec.php` — Static definitions and builder for OpenAPI/Swagger documentation.
 - `database/migrations/` — Database schema migrations.
-- `routes/api/` — Modular route definition files (`auth.php`, `company.php`, `profile.php`).
+- `routes/api/` — Modular route definition files (`auth.php`, `company.php`, `profile.php`, `posts.php`).
 - `tests/` — Feature and Unit tests using Pest.
