@@ -16,18 +16,10 @@ class SocialProfileService
      * @param array $data
      * @return SocialProfileResource|JsonResponse
      */
-    public function createSocialProfile(User $user, array $data): SocialProfileResource|JsonResponse
+    public function createSocialProfile(User $user, array $data): SocialProfileResource
     {
-        try {
-            $socialProfile = $user->socialProfiles()->create($data);
-            return new SocialProfileResource($socialProfile);
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to create social profile',
-                ['error' => $e->getMessage()],
-                500
-            );
-        }
+        $socialProfile = $user->socialProfiles()->create($data);
+        return new SocialProfileResource($socialProfile);
     }
 
     /**
@@ -37,18 +29,10 @@ class SocialProfileService
      * @param array $data
      * @return SocialProfileResource|JsonResponse
      */
-    public function updateSocialProfile(SocialProfile $socialProfile, array $data): SocialProfileResource|JsonResponse
+    public function updateSocialProfile(SocialProfile $socialProfile, array $data): SocialProfileResource
     {
-        try {
-            $socialProfile->update($data);
-            return new SocialProfileResource($socialProfile);
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to update social profile',
-                ['error' => $e->getMessage()],
-                500
-            );
-        }
+        $socialProfile->update($data);
+        return new SocialProfileResource($socialProfile);
     }
 
     /**
@@ -57,17 +41,9 @@ class SocialProfileService
      * @param SocialProfile $socialProfile
      * @return bool|JsonResponse
      */
-    public function deleteSocialProfile(SocialProfile $socialProfile): bool|JsonResponse
+    public function deleteSocialProfile(SocialProfile $socialProfile): bool
     {
-        try {
-            $socialProfile->delete();
-            return true;
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to delete social profile',
-                ['error' => $e->getMessage()],
-                500
-            );
-        }
+        $socialProfile->delete();
+        return true;
     }
 }

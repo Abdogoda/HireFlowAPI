@@ -16,18 +16,10 @@ class ProjectService
      * @param array $data
      * @return ProjectResource|JsonResponse
      */
-    public function createProject(User $user, array $data): ProjectResource|JsonResponse
+    public function createProject(User $user, array $data): ProjectResource
     {
-        try {
-            $project = $user->projects()->create($data);
-            return new ProjectResource($project);
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to create project',
-                ['error' => $e->getMessage()],
-                500
-            );
-        }
+        $project = $user->projects()->create($data);
+        return new ProjectResource($project);
     }
 
     /**
@@ -37,18 +29,10 @@ class ProjectService
      * @param array $data
      * @return ProjectResource|JsonResponse
      */
-    public function updateProject(Project $project, array $data): ProjectResource|JsonResponse
+    public function updateProject(Project $project, array $data): ProjectResource
     {
-        try {
-            $project->update($data);
-            return new ProjectResource($project);
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to update project',
-                ['error' => $e->getMessage()],
-                500
-            );
-        }
+        $project->update($data);
+        return new ProjectResource($project);
     }
 
     /**
@@ -57,17 +41,9 @@ class ProjectService
      * @param Project $project
      * @return bool|JsonResponse
      */
-    public function deleteProject(Project $project): bool|JsonResponse
+    public function deleteProject(Project $project): bool
     {
-        try {
-            $project->delete();
-            return true;
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to delete project',
-                ['error' => $e->getMessage()],
-                500
-            );
-        }
+        $project->delete();
+        return true;
     }
 }

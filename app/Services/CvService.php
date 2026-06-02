@@ -19,27 +19,19 @@ class CvService
      * @param string|null $title
      * @return ResumeResource|JsonResponse
      */
-    public function uploadCv(User $user, UploadedFile $file, ?string $title = null): ResumeResource|JsonResponse
+    public function uploadCv(User $user, UploadedFile $file, ?string $title = null): ResumeResource
     {
-        try {
-            $path = $file->store('cvs', 'public');
-            $url = Storage::url($path);
+        $path = $file->store('cvs', 'public');
+        $url = Storage::url($path);
 
-            $resume = $user->resumes()->create([
-                'file_name' => $file->getClientOriginalName(),
-                'title' => $title ?? $file->getClientOriginalName(),
-                'file_path' => $path,
-                'file_url' => $url,
-            ]);
+        $resume = $user->resumes()->create([
+            'file_name' => $file->getClientOriginalName(),
+            'title' => $title ?? $file->getClientOriginalName(),
+            'file_path' => $path,
+            'file_url' => $url,
+        ]);
 
-            return new ResumeResource($resume);
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to upload CV',
-                ['error' => $e->getMessage()],
-                500
-            );
-        }
+        return new ResumeResource($resume);
     }
 
     /**
@@ -48,22 +40,14 @@ class CvService
      * @param Resume $resume
      * @return bool|JsonResponse
      */
-    public function deleteCv(Resume $resume): bool|JsonResponse
+    public function deleteCv(Resume $resume): bool
     {
-        try {
-            if ($resume->file_path && Storage::exists($resume->file_path)) {
-                Storage::delete($resume->file_path);
-            }
-
-            $resume->delete();
-            return true;
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to delete CV',
-                ['error' => $e->getMessage()],
-                500
-            );
+        if ($resume->file_path && Storage::exists($resume->file_path)) {
+            Storage::delete($resume->file_path);
         }
+
+        $resume->delete();
+        return true;
     }
 
     /**
@@ -72,16 +56,8 @@ class CvService
      * @param User $user
      * @return \Illuminate\Database\Eloquent\Collection|JsonResponse
      */
-    public function getUserCvs(User $user): \Illuminate\Database\Eloquent\Collection|JsonResponse
+    public function getUserCvs(User $user): \Illuminate\Database\Eloquent\Collection
     {
-        try {
-            return $user->resumes()->get();
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to retrieve CVs',
-                ['error' => $e->getMessage()],
-                500
-            );
-        }
+        return $user->resumes()->get();
     }
 }

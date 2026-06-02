@@ -17,18 +17,10 @@ class ProfileService
      * @param array $data
      * @return UserResource|JsonResponse
      */
-    public function updateProfile(User $user, array $data): UserResource|JsonResponse
+    public function updateProfile(User $user, array $data): UserResource
     {
-        try {
-            $user->update($data);
-            return new UserResource($user->load('role', 'skills', 'experiences', 'projects', 'resumes', 'socialProfiles'));
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to update profile',
-                ['error' => $e->getMessage()],
-                500
-            );
-        }
+        $user->update($data);
+        return new UserResource($user->load('role', 'skills', 'experiences', 'projects', 'resumes', 'socialProfiles'));
     }
 
     /**
@@ -38,27 +30,19 @@ class ProfileService
      * @param UploadedFile $file
      * @return string|JsonResponse File path or error response
      */
-    public function uploadAvatar(User $user, UploadedFile $file): string|JsonResponse
+    public function uploadAvatar(User $user, UploadedFile $file): string
     {
-        try {
-            // Delete old avatar if exists
-            if ($user->avatar && Storage::exists($user->avatar)) {
-                Storage::delete($user->avatar);
-            }
-
-            $path = $file->store('avatars', 'public');
-            $url = Storage::url($path);
-
-            $user->update(['avatar' => $path]);
-
-            return $url;
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to upload avatar',
-                ['error' => $e->getMessage()],
-                500
-            );
+        // Delete old avatar if exists
+        if ($user->avatar && Storage::exists($user->avatar)) {
+            Storage::delete($user->avatar);
         }
+
+        $path = $file->store('avatars', 'public');
+        $url = Storage::url($path);
+
+        $user->update(['avatar' => $path]);
+
+        return $url;
     }
 
     /**
@@ -67,22 +51,14 @@ class ProfileService
      * @param User $user
      * @return bool|JsonResponse
      */
-    public function deleteAvatar(User $user): bool|JsonResponse
+    public function deleteAvatar(User $user): bool
     {
-        try {
-            if ($user->avatar && Storage::exists($user->avatar)) {
-                Storage::delete($user->avatar);
-            }
-
-            $user->update(['avatar' => null]);
-            return true;
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to delete avatar',
-                ['error' => $e->getMessage()],
-                500
-            );
+        if ($user->avatar && Storage::exists($user->avatar)) {
+            Storage::delete($user->avatar);
         }
+
+        $user->update(['avatar' => null]);
+        return true;
     }
 
     /**
@@ -93,30 +69,22 @@ class ProfileService
      * @param string $type 'profile' or 'thumbnail'
      * @return string|JsonResponse File path or error response
      */
-    public function uploadPicture(User $user, UploadedFile $file, string $type = 'profile'): string|JsonResponse
+    public function uploadPicture(User $user, UploadedFile $file, string $type = 'profile'): string
     {
-        try {
-            $column = $type === 'thumbnail' ? 'thumbnail' : 'profile_image';
+        $column = $type === 'thumbnail' ? 'thumbnail' : 'profile_image';
 
-            // Delete old picture if exists
-            if ($user->$column && Storage::exists($user->$column)) {
-                Storage::delete($user->$column);
-            }
-
-            $folder = $type === 'thumbnail' ? 'thumbnails' : 'profile-pictures';
-            $path = $file->store($folder, 'public');
-            $url = Storage::url($path);
-
-            $user->update([$column => $path]);
-
-            return $url;
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                "Failed to upload {$type} picture",
-                ['error' => $e->getMessage()],
-                500
-            );
+        // Delete old picture if exists
+        if ($user->$column && Storage::exists($user->$column)) {
+            Storage::delete($user->$column);
         }
+
+        $folder = $type === 'thumbnail' ? 'thumbnails' : 'profile-pictures';
+        $path = $file->store($folder, 'public');
+        $url = Storage::url($path);
+
+        $user->update([$column => $path]);
+
+        return $url;
     }
 
     /**
@@ -126,24 +94,16 @@ class ProfileService
      * @param string $type 'profile' or 'thumbnail'
      * @return bool|JsonResponse
      */
-    public function deletePicture(User $user, string $type = 'profile'): bool|JsonResponse
+    public function deletePicture(User $user, string $type = 'profile'): bool
     {
-        try {
-            $column = $type === 'thumbnail' ? 'thumbnail' : 'profile_image';
+        $column = $type === 'thumbnail' ? 'thumbnail' : 'profile_image';
 
-            if ($user->$column && Storage::exists($user->$column)) {
-                Storage::delete($user->$column);
-            }
-
-            $user->update([$column => null]);
-            return true;
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                "Failed to delete {$type} picture",
-                ['error' => $e->getMessage()],
-                500
-            );
+        if ($user->$column && Storage::exists($user->$column)) {
+            Storage::delete($user->$column);
         }
+
+        $user->update([$column => null]);
+        return true;
     }
 
     /**
@@ -152,23 +112,15 @@ class ProfileService
      * @param User $user
      * @return UserResource|JsonResponse
      */
-    public function getProfile(User $user): UserResource|JsonResponse
+    public function getProfile(User $user): UserResource
     {
-        try {
-            return new UserResource($user->load([
-                'role',
-                'skills',
-                'experiences',
-                'projects',
-                'resumes',
-                'socialProfiles'
-            ]));
-        } catch (\Exception $e) {
-            return ResponseService::error(
-                'Failed to retrieve profile',
-                ['error' => $e->getMessage()],
-                500
-            );
-        }
+        return new UserResource($user->load([
+            'role',
+            'skills',
+            'experiences',
+            'projects',
+            'resumes',
+            'socialProfiles'
+        ]));
     }
 }
