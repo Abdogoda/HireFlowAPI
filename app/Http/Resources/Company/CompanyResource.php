@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Company;
 
-use App\Enums\Authorization\CompanyRoles;
+use App\Enums\Company\CompanyRoles;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\User\UserSimpleResource;

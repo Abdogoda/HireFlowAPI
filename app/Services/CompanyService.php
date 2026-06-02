@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\Authorization\CompanyRoles;
+use App\Enums\Company\CompanyRoles;
 use App\Http\Resources\Company\CompanyPersonResource;
 use App\Http\Resources\Company\CompanyResource;
 use App\Models\Company;

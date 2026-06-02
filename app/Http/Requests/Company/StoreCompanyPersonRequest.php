@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Company;
 
-use App\Enums\Authorization\CompanyRoles;
+use App\Enums\Company\CompanyRoles;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCompanyPersonRequest extends FormRequest

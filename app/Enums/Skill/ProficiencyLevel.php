@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums\Profile;
+namespace App\Enums\Skill;
 
 use App\Traits\BaseEnum;
 

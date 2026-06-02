@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\Authorization\CompanyRoles;
+use App\Enums\Company\CompanyRoles;
 use App\Policies\CompanyPolicy;
 
 beforeEach(function () {

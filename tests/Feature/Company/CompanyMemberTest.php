@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\Authorization\CompanyRoles;
+use App\Enums\Company\CompanyRoles;
 use App\Notifications\CompanyMemberAddedNotification;
 use App\Notifications\CompanyMemberRemovedNotification;
 use Illuminate\Support\Facades\Notification;

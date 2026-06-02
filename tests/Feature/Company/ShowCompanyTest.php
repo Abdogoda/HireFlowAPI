@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\Authorization\CompanyRoles;
+use App\Enums\Company\CompanyRoles;
 
 beforeEach(function () {
         $this->createDefaultRoles();

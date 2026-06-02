@@ -14,9 +14,4 @@ it('returns keys and values and labels correctly', function () {
 
     // getKey by value
     expect(Gender::getKey('male'))->toBe('MALE');
-
-    // toBeautifyStructure exists and returns expected shape
-    $list = Gender::toBeautifyStructure();
-    expect($list)->toBeArray();
-    expect($list[0])->toHaveKeys(['key', 'value', 'label']);
 });

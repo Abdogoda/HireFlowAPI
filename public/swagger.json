@@ -4117,6 +4117,108 @@
                     }
                 ]
             }
+        },
+        "/vacancies": {
+            "get": {
+                "tags": [
+                    "Vacancy"
+                ],
+                "summary": "List vacancies",
+                "description": "List vacancies with filters, pagination and sorting",
+                "responses": {
+                    "200": {
+                        "description": "Vacancies retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Vacancy"
+                ],
+                "summary": "Create a vacancy",
+                "description": "Create a vacancy for a company. Only company owners or company members with role=\"recruiter\" may create.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VacancyCreateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Vacancy created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {"$ref":"#/components/responses/Unauthenticated"},
+                    "403": {"$ref":"#/components/responses/Forbidden"},
+                    "422": {"$ref":"#/components/responses/ValidationFailed"}
+                },
+                "security": [ { "bearerAuth": [] } ]
+            }
+        },
+        "/vacancies/{vacancy}": {
+            "get": {
+                "tags": ["Vacancy"],
+                "summary": "Get vacancy",
+                "description": "Retrieve a vacancy by id",
+                "responses": {
+                    "200": {"$ref": "#/components/responses/Success"},
+                    "401": {"$ref":"#/components/responses/Unauthenticated"},
+                    "404": {"$ref":"#/components/responses/NotFound"}
+                },
+                "security": [ { "bearerAuth": [] } ],
+                "parameters": [
+                    { "name": "vacancy", "in": "path", "required": true, "schema": { "type": "integer" }, "description": "Vacancy id" }
+                ]
+            },
+            "patch": {
+                "tags": ["Vacancy"],
+                "summary": "Update vacancy",
+                "description": "Update a vacancy. Only creator, company owner, or company recruiter may update.",
+                "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VacancyUpdateRequest" } } } },
+                "responses": { "200": {"$ref":"#/components/responses/Success"}, "401": {"$ref":"#/components/responses/Unauthenticated"}, "403": {"$ref":"#/components/responses/Forbidden"}, "404": {"$ref":"#/components/responses/NotFound"}, "422": {"$ref":"#/components/responses/ValidationFailed"} },
+                "security": [ { "bearerAuth": [] } ],
+                "parameters": [ { "name": "vacancy", "in": "path", "required": true, "schema": { "type": "integer" }, "description": "Vacancy id" } ]
+            },
+            "delete": {
+                "tags": ["Vacancy"],
+                "summary": "Delete vacancy",
+                "description": "Delete a vacancy. Only creator, company owner, or company recruiter may delete.",
+                "responses": { "200": {"$ref":"#/components/responses/Success"}, "401": {"$ref":"#/components/responses/Unauthenticated"}, "403": {"$ref":"#/components/responses/Forbidden"}, "404": {"$ref":"#/components/responses/NotFound"} },
+                "security": [ { "bearerAuth": [] } ],
+                "parameters": [ { "name": "vacancy", "in": "path", "required": true, "schema": { "type": "integer" }, "description": "Vacancy id" } ]
+            }
         }
     },
     "components": {

@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Enums\Authorization\CompanyRoles;
+use App\Enums\Company\CompanyRoles;
 use App\Models\Company;
 use App\Models\User;
 
