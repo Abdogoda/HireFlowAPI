@@ -7,8 +7,8 @@ HireFlow API is a modern recruitment and talent acquisition platform backend bui
 > **Note:** This project is currently under development, expect changes and updates frequently.
 
 ![Project Status](https://img.shields.io/badge/status-active%20development-yellow)
-![Completion](https://img.shields.io/badge/completion-25%25-brightgreen)
-![Tests](https://img.shields.io/badge/tests-173%20passed-success)
+![Completion](https://img.shields.io/badge/completion-35%25-brightgreen)
+![Tests](https://img.shields.io/badge/tests-193%20passed-success)
 
 ## 🗺️ Development Roadmap
 
@@ -18,7 +18,7 @@ HireFlow API is a modern recruitment and talent acquisition platform backend bui
 | Phase 2 | ✅ Complete | Company Management, Company Members, Roles & Permissions |
 | Phase 3 | ✅ Complete | Candidate Profiles, Skills, CV Upload, Portfolio |
 | Phase 4 | ✅ Complete | Job Management, Job Search, Filtering, Sorting |
-| Phase 5 | ✅ Complete | Posts (Personal & Company), Post Categories, Post Tags |
+| Phase 5 | ✅ Complete | Posts (Personal & Company), Post Categories, Post Tags, **Scheduled Posts Auto-Publishing** |
 | Phase 6 | 🚧 In Progress | Job Applications System, Application Workflow |
 | Phase 7 | ⏳ Pending | Interview Scheduling, Interview Management |
 | Phase 8 | ⏳ Pending | Notifications System (Email + Database) |
@@ -227,7 +227,9 @@ All routes are prefixed with `/api`.
 
 Notes:
 
-- Posts support HTML content, tags, attachments, category, status, and post date/time.
+- Posts support HTML content, tags, file attachments, category, and four statuses: `draft`, `published`, `scheduled`, `archived`.
+- **Scheduled posts**: set `status=scheduled` with a `post_date` (today or future) and `post_time` (`HH:MM` or `HH:MM:SS`). A background scheduler running every minute automatically transitions due posts to `published`.
+- The response includes a computed `scheduled_at` field (ISO-8601, e.g. `2026-06-10T14:30:00`) combining `post_date` and `post_time` — `null` when either is not set.
 - Company post permissions follow current company membership roles: `owner`, `admin`, and `recruiter`.
 - The Swagger JSON is served from `/api/documentation.json` and reflects the same post endpoints.
 
@@ -263,7 +265,7 @@ Or manually using the Artisan runner:
 php artisan test
 ```
 
-The suite currently covers **169 tests** with **615 assertions** across Auth, Profile, Company, Post, and Vacancy feature areas.
+The suite currently covers **193 tests** with **673 assertions** across Auth, Profile, Company, Post (including scheduled post flows), and Vacancy feature areas.
 
 ---
 
@@ -271,12 +273,14 @@ The suite currently covers **169 tests** with **615 assertions** across Auth, Pr
 
 Here are the key directories containing the main domain logic:
 
-- `app/Http/Controllers/` — API Controllers grouped by domains (`Auth`, `Profile`, `Company`, `Post`).
+- `app/Http/Controllers/` — API Controllers grouped by domains (`Auth`, `Profile`, `Company`, `Post`, `Vacancy`).
 - `app/Models/` — Eloquent models detailing relations and properties.
 - `app/Policies/` — Authorization policies (e.g. `CompanyPolicy`, `PostPolicy`).
 - `app/Services/` — Business logic layer (e.g. `CompanyService`, `PostService`, `AuthService`).
 - `app/Enums/` — Typed enums for roles (`CompanyRoles`), post categories/statuses, social profile types, etc.
+- `app/Console/Commands/` — Artisan commands (e.g. `PublishScheduledPosts` — auto-publishes due scheduled posts).
 - `app/Support/OpenApiSpec.php` — Static definitions and builder for OpenAPI/Swagger documentation.
 - `database/migrations/` — Database schema migrations.
-- `routes/api/` — Modular route definition files (`auth.php`, `company.php`, `profile.php`, `posts.php`).
+- `routes/api/` — Modular route definition files (`auth.php`, `company.php`, `profile.php`, `posts.php`, `vacancies.php`).
+- `routes/console.php` — Laravel scheduler registration (scheduled posts publisher runs every minute).
 - `tests/` — Feature and Unit tests using Pest.
