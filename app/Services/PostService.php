@@ -97,6 +97,28 @@ class PostService
         return true;
     }
 
+    public function publishScheduledPosts(): int
+    {
+        $now = now();
+        $today = $now->toDateString();
+        $currentTime = $now->format('H:i:s');
+
+        return Post::query()
+            ->where('status', PostStatus::SCHEDULED->value)
+            ->where(function ($query) use ($today, $currentTime) {
+                // Posts whose date has already passed
+                $query->where('post_date', '<', $today)
+                    // Or posts scheduled for today where the time has arrived
+                    ->orWhere(function ($q) use ($today, $currentTime) {
+                        $q->where('post_date', $today)
+                            ->where('post_time', '<=', $currentTime);
+                    });
+            })
+            ->update(['status' => PostStatus::PUBLISHED->value]);
+    }
+
+
+
     private function normalizePayload(array $data, ?User $user = null, ?Company $company = null, ?Post $post = null): array
     {
         $payload = $data;

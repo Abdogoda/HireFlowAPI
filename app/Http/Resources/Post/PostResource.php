@@ -22,6 +22,9 @@ class PostResource extends JsonResource
             'status' => $this->status?->value,
             'post_date' => $this->post_date?->toDateString(),
             'post_time' => $this->post_time,
+            'scheduled_at' => $this->post_date && $this->post_time
+                ? $this->post_date->toDateString() . 'T' . $this->post_time
+                : null,
             'author' => $this->relationLoaded('author') ? new UserSimpleResource($this->author) : null,
             'company' => $this->relationLoaded('company') && $this->company !== null ? [
                 'id' => $this->company->id,

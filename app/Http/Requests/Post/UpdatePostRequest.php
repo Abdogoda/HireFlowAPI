@@ -21,7 +21,7 @@ class UpdatePostRequest extends FormRequest
             'category' => 'sometimes|in:' . PostCategory::toString(),
             'status' => 'sometimes|in:' . PostStatus::toString(),
             'post_date' => 'sometimes|nullable|required_if:status,scheduled|date|after_or_equal:today',
-            'post_time' => 'sometimes|nullable|required_if:status,scheduled|date_format:H:i',
+            'post_time' => 'sometimes|nullable|required_if:status,scheduled|date_format:H:i,H:i:s',
             'tags' => 'sometimes|array',
             'tags.*' => 'string|max:50',
             'attachments' => 'sometimes|array',
