@@ -107,15 +107,16 @@ class PostService
             ->where('status', PostStatus::SCHEDULED->value)
             ->where(function ($query) use ($today, $currentTime) {
                 // Posts whose date has already passed
-                $query->where('post_date', '<', $today)
+                $query->whereDate('post_date', '<', $today)
                     // Or posts scheduled for today where the time has arrived
                     ->orWhere(function ($q) use ($today, $currentTime) {
-                        $q->where('post_date', $today)
+                        $q->whereDate('post_date', $today)
                             ->where('post_time', '<=', $currentTime);
                     });
             })
             ->update(['status' => PostStatus::PUBLISHED->value]);
     }
+
 
 
 
